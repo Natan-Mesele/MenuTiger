@@ -113,49 +113,49 @@ function Surveys() {
   };
 
   const addQuestion = () => {
-  if (!questionText) return;
+    if (!questionText) return;
 
-  const newQuestion = {
-    text: questionText,
-    type: questionType,
-    required: isQuestionRequired,
-    options: questionType === "multiple_choice" ? options.filter(opt => opt) : [],
-    // Include all possible answer types
-    textAnswer: questionType === "text" ? textAnswer : null,
-    starRating: questionType === "rating" ? starRating : 0,
-    yesNoAnswer: questionType === "yes_no" ? yesNoAnswer : null,
-    selectedSmiley: questionType === "smiley" ? selectedSmiley : null
+    const newQuestion = {
+      text: questionText,
+      type: questionType,
+      required: isQuestionRequired,
+      options: questionType === "multiple_choice" ? options.filter(opt => opt) : [],
+      // Include all possible answer types
+      textAnswer: questionType === "text" ? textAnswer : null,
+      starRating: questionType === "rating" ? starRating : 0,
+      yesNoAnswer: questionType === "yes_no" ? yesNoAnswer : null,
+      selectedSmiley: questionType === "smiley" ? selectedSmiley : null
+    };
+
+    setFormData({
+      ...formData,
+      questions: [...formData.questions, newQuestion]
+    });
+
+    // Reset all question states
+    setQuestionText("");
+    setQuestionType("text");
+    setIsQuestionRequired(false);
+    setOptions([""]);
+    setTextAnswer("");
+    setStarRating(0);
+    setYesNoAnswer(null);
+    setSelectedSmiley(null);
   };
 
-  setFormData({
-    ...formData,
-    questions: [...formData.questions, newQuestion]
-  });
+  const handleSubmitSurvey = () => {
+    // Here you would typically send the formData to your backend
+    console.log("Survey submitted:", formData);
+    alert("Survey submitted successfully!");
 
-  // Reset all question states
-  setQuestionText("");
-  setQuestionType("text");
-  setIsQuestionRequired(false);
-  setOptions([""]);
-  setTextAnswer("");
-  setStarRating(0);
-  setYesNoAnswer(null);
-  setSelectedSmiley(null);
-};
-
-const handleSubmitSurvey = () => {
-  // Here you would typically send the formData to your backend
-  console.log("Survey submitted:", formData);
-  alert("Survey submitted successfully!");
-  
-  // Reset form if needed
-  setFormData({
-    name: "",
-    welcomeNote: "",
-    active: true,
-    questions: []
-  });
-};
+    // Reset form if needed
+    setFormData({
+      name: "",
+      welcomeNote: "",
+      active: true,
+      questions: []
+    });
+  };
 
   // Render question preview based on type
   const renderQuestionPreview = () => {
@@ -435,91 +435,91 @@ const handleSubmitSurvey = () => {
 
                   {/* Existing Questions */}
                   {/* Existing Questions Preview */}
-{formData.questions.length > 0 && (
-  <div className="space-y-4">
-    {formData.questions.map((question, qIndex) => (
-      <div key={qIndex} className="border border-gray-200 dark:border-gray-700 rounded-md p-4 bg-white dark:bg-gray-800 text-center">
-        <h3 className="font-medium mb-4">
-          {question.text} {question.required && <span className="text-red-500">*</span>}
-        </h3>
+                  {formData.questions.length > 0 && (
+                    <div className="space-y-4">
+                      {formData.questions.map((question, qIndex) => (
+                        <div key={qIndex} className="border border-gray-200 dark:border-gray-700 rounded-md p-4 bg-white dark:bg-gray-800 text-center">
+                          <h3 className="font-medium mb-4">
+                            {question.text} {question.required && <span className="text-red-500">*</span>}
+                          </h3>
 
-        {/* Text Box Preview */}
-        {question.type === "text" && (
-          <input
-            type="text"
-            value={question.textAnswer || ""}
-            readOnly
-            className="w-3/4 mx-auto border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700"
-            placeholder="Your answer"
-          />
-        )}
+                          {/* Text Box Preview */}
+                          {question.type === "text" && (
+                            <input
+                              type="text"
+                              value={question.textAnswer || ""}
+                              readOnly
+                              className="w-3/4 mx-auto border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-gray-100 dark:bg-gray-700"
+                              placeholder="Your answer"
+                            />
+                          )}
 
-        {/* Star Rating Preview */}
-        {question.type === "rating" && (
-          <div className="flex justify-center space-x-2">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <span
-                key={star}
-                className={`text-3xl ${star <= question.starRating ? 'text-yellow-400' : 'text-gray-400'}`}
-              >
-                ★
-              </span>
-            ))}
-          </div>
-        )}
+                          {/* Star Rating Preview */}
+                          {question.type === "rating" && (
+                            <div className="flex justify-center space-x-2">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <span
+                                  key={star}
+                                  className={`text-3xl ${star <= question.starRating ? 'text-yellow-400' : 'text-gray-400'}`}
+                                >
+                                  ★
+                                </span>
+                              ))}
+                            </div>
+                          )}
 
-        {/* Yes/No Preview */}
-        {question.type === "yes_no" && (
-          <div className="flex justify-center space-x-4">
-            <span className={`px-6 py-2 rounded-md ${question.yesNoAnswer === 'yes' ? 'bg-green-500 text-white' : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'}`}>
-              Yes
-            </span>
-            <span className={`px-6 py-2 rounded-md ${question.yesNoAnswer === 'no' ? 'bg-red-500 text-white' : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'}`}>
-              No
-            </span>
-          </div>
-        )}
+                          {/* Yes/No Preview */}
+                          {question.type === "yes_no" && (
+                            <div className="flex justify-center space-x-4">
+                              <span className={`px-6 py-2 rounded-md ${question.yesNoAnswer === 'yes' ? 'bg-green-500 text-white' : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'}`}>
+                                Yes
+                              </span>
+                              <span className={`px-6 py-2 rounded-md ${question.yesNoAnswer === 'no' ? 'bg-red-500 text-white' : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'}`}>
+                                No
+                              </span>
+                            </div>
+                          )}
 
-        {/* Smiley Rating Preview */}
-        {question.type === "smiley" && (
-          <div className="flex justify-center space-x-4">
-            {[
-              { emoji: '😞', value: 'very_unhappy' },
-              { emoji: '😐', value: 'neutral' },
-              { emoji: '😊', value: 'happy' },
-              { emoji: '😍', value: 'very_happy' }
-            ].map((smiley, index) => (
-              <span
-                key={index}
-                className={`text-3xl ${question.selectedSmiley === smiley.value ? 'scale-125' : ''}`}
-              >
-                {smiley.emoji}
-              </span>
-            ))}
-          </div>
-        )}
+                          {/* Smiley Rating Preview */}
+                          {question.type === "smiley" && (
+                            <div className="flex justify-center space-x-4">
+                              {[
+                                { emoji: '😞', value: 'very_unhappy' },
+                                { emoji: '😐', value: 'neutral' },
+                                { emoji: '😊', value: 'happy' },
+                                { emoji: '😍', value: 'very_happy' }
+                              ].map((smiley, index) => (
+                                <span
+                                  key={index}
+                                  className={`text-3xl ${question.selectedSmiley === smiley.value ? 'scale-125' : ''}`}
+                                >
+                                  {smiley.emoji}
+                                </span>
+                              ))}
+                            </div>
+                          )}
 
-        {/* Multiple Choice Preview */}
-        {question.type === "multiple_choice" && question.options.length > 0 && (
-          <div className="space-y-2 w-3/4 mx-auto">
-            {question.options.map((option, index) => (
-              <div key={index} className="flex items-center justify-start">
-                <input
-                  type="radio"
-                  id={`existing-option-${qIndex}-${index}`}
-                  name={`existing-options-${qIndex}`}
-                  className="mr-2"
-                  readOnly
-                />
-                <label htmlFor={`existing-option-${qIndex}-${index}`}>{option}</label>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    ))}
-  </div>
-)}
+                          {/* Multiple Choice Preview */}
+                          {question.type === "multiple_choice" && question.options.length > 0 && (
+                            <div className="space-y-2 w-3/4 mx-auto">
+                              {question.options.map((option, index) => (
+                                <div key={index} className="flex items-center justify-start">
+                                  <input
+                                    type="radio"
+                                    id={`existing-option-${qIndex}-${index}`}
+                                    name={`existing-options-${qIndex}`}
+                                    className="mr-2"
+                                    readOnly
+                                  />
+                                  <label htmlFor={`existing-option-${qIndex}-${index}`}>{option}</label>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {/* Right Column - Preview */}
                 <div className="space-y-6 h-[calc(100vh-200px)] overflow-y-auto">

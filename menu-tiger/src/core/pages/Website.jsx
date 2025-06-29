@@ -17,11 +17,19 @@ import {
 } from "react-icons/fa";
 
 function Website() {
-  const [activeTab, setActiveTab] = useState("colors");
+  const [activeTab, setActiveTab] = useState("homepage");
   const [selectedTheme, setSelectedTheme] = useState("CrimsonLight");
   const [selectedSection, setSelectedSection] = useState("section-0");
   const [primaryColor, setPrimaryColor] = useState("#C8322F");
   const [secondaryColor, setSecondaryColor] = useState("#FFFFFF");
+  const [activeTabs, setActiveTabs] = useState('configuration');
+  const [focusedField, setFocusedField] = useState(null);
+  const [promotionData, setPromotionData] = useState({
+    type: "discount_on_cart",
+    name: "",
+    description: "",
+    stores: "",
+  });
 
   const sectionIcons = {
     'Hero Section': <FaImage className="text-gray-500" />,
@@ -29,6 +37,18 @@ function Website() {
     'Featured Food': <FaUtensils className="text-gray-500" />,
     'Why Choose Us': <FaStar className="text-gray-500" />,
     'Newsletter': <FaEnvelope className="text-gray-500" />
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setPromotionData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleBlur = () => {
+    setFocusedField(null);
   };
 
   const themes = {
@@ -46,33 +66,15 @@ function Website() {
       primary: "#3A86FF",
       secondary: "#8338EC",
       name: "Custom"
-    },
-    'theme-1': {
-      primary: "#C8322F",
-      secondary: "#FFFFFF",
-      name: "Theme 1"
-    },
-    'theme-2': {
-      primary: "#FF7E5F",
-      secondary: "#FEB47B",
-      name: "Theme 2"
-    },
-    'theme-3': {
-      primary: "#3A86FF",
-      secondary: "#8338EC",
-      name: "Theme 3"
-    },
-    'theme-4': {
-      primary: "#4CAF50",
-      secondary: "#8BC34A",
-      name: "Theme 4"
     }
   };
 
   const handleThemeSelect = (theme) => {
-    setSelectedTheme(theme);
-    setPrimaryColor(themes[theme].primary);
-    setSecondaryColor(themes[theme].secondary);
+    if (themes[theme]) { // Only update if theme exists
+      setSelectedTheme(theme);
+      setPrimaryColor(themes[theme].primary);
+      setSecondaryColor(themes[theme].secondary);
+    }
   };
 
   return (
@@ -139,17 +141,6 @@ function Website() {
         {/* Tab Content */}
         {activeTab === "homepage" && (
           <div className="space-y-6">
-            {/* Top section with "Homepage" text and Save button */}
-            <div className="flex justify-between items-center">
-              <div className="bg-gray-100 dark:bg-gray-700 px-4 py-3 rounded-md">
-                <span className="font-medium">Homepage Sections</span>
-              </div>
-              <button className="bg-secondary text-white px-4 py-3 rounded-md flex items-center hover:bg-primary transition-colors">
-                <FaCheck className="mr-2" />
-                Save
-              </button>
-            </div>
-
             {/* Divider line */}
             <div className="border-b border-gray-300 dark:border-gray-600"></div>
 
@@ -182,101 +173,456 @@ function Website() {
               {/* Right side - Section preview */}
               <div className="w-full md:w-2/3">
                 {selectedSection === 'section-0' && (
-                  <div className="border border-gray-200 dark:border-gray-600 rounded-md p-4">
-                    <h3 className="text-xl font-semibold mb-4">Hero Section Preview</h3>
-                    <div className="bg-gradient-to-r from-primary to-secondary h-64 rounded-lg flex items-center justify-center text-white">
-                      <div className="text-center p-6">
-                        <h2 className="text-3xl font-bold mb-4">Welcome to Our Restaurant</h2>
-                        <p className="mb-6">Discover our delicious menu and special offers</p>
-                        <button className="bg-white text-primary px-6 py-2 rounded-full font-medium hover:bg-opacity-90 transition">
-                          View Menu
-                        </button>
+                  <div className="border border-gray-200 dark:border-gray-600 rounded-md">
+                    {/* Top header with title and save button */}
+                    <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-600">
+                      <h3 className="text-lg text-gray-500 bg-gray-100 rounded-sm px-3 py-3 font-semibold">Hero Section</h3>
+                      <button className="bg-secondary hover:bg-primary cursor-pointer text-white px-4 py-3 rounded-sm font-medium hover:bg-opacity-90 transition">
+                        Save
+                      </button>
+                    </div>
+                    {/* Configuration and Localize tabs */}
+                    <div className="border-b border-gray-200 dark:border-gray-600">
+                      <div className="border-b border-gray-200 dark:border-gray-600">
+                        <div className="flex">
+                          <button
+                            onClick={() => setActiveTabs('configuration')}
+                            className={`px-4 py-2 font-medium ${activeTabs === 'configuration'
+                              ? 'border-b-2 border-primary text-primary'
+                              : 'text-gray-500 dark:text-gray-400'
+                              }`}
+                          >
+                            Configuration
+                          </button>
+                          <button
+                            onClick={() => setActiveTabs('localize')}
+                            className={`px-4 py-2 font-medium ${activeTabs === 'localize'
+                              ? 'border-b-2 border-primary text-primary'
+                              : 'text-gray-500 dark:text-gray-400'
+                              }`}
+                          >
+                            Localize
+                          </button>
+                        </div>
                       </div>
+                    </div>
+
+                    {/* Tab content areas */}
+                    <div className="p-4">
+                      {/* Configuration tab content would go here */}
+                      {activeTabs === 'configuration' && (
+                        <div className="max-w-sm space-y-4">
+                          <div className="flex flex-row items-center justify-between px-4 py-2 border border-gray-300 rounded-md">
+                            <span className="">
+                              Button Link
+                            </span>
+                            <FaChevronRight className="text-gray-400 text-sm" />
+                          </div>
+                          <div className="space-y-4">
+                            <div className={`flex items-center border ${focusedField === 'stores' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'} rounded-md transition-colors`}>
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3 py-2 border-r border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 whitespace-nowrap">
+                                Redirect to <span className="text-red-500">*</span>
+                              </span>
+                              <select
+                                name="stores"
+                                value={promotionData.stores}
+                                onChange={handleInputChange}
+                                onFocus={() => handleFocus('stores')}
+                                onBlur={handleBlur}
+                                className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none rounded-r-md"
+                              >
+                                <option value="">Default(Website menu)</option>
+                                <option value="all">Custom URL</option>
+                              </select>
+                            </div>
+                            <div className={`flex items-center border ${focusedField === 'name' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'} rounded-md transition-colors`}>
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3 py-2 border-r border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 whitespace-nowrap">
+                                Heading  <span className="text-red-500">*</span>
+                              </span>
+                              <input
+                                type="text"
+                                name="name"
+                                value={promotionData.name}
+                                onChange={handleInputChange}
+                                onFocus={() => handleFocus('name')}
+                                onBlur={handleBlur}
+                                className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none rounded-r-md"
+                                placeholder="Enter promotion name"
+                              />
+                            </div>
+                            {/* Description */}
+                            <div className={`flex flex-col border ${focusedField === 'description' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'} rounded-md transition-colors`}>
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3 py-2 border-b border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
+                                Description <span className="text-red-500">*</span>
+                              </span>
+                              <textarea
+                                name="description"
+                                value={promotionData.description}
+                                onChange={handleInputChange}
+                                onFocus={() => handleFocus('description')}
+                                onBlur={handleBlur}
+                                className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none rounded-b-md"
+                                placeholder="Enter description"
+                                rows={3}
+                              />
+                            </div>
+
+                          </div>
+                        </div>
+
+                      )}
+
+                      {/* Localize tab content would go here */}
+                      {activeTabs === 'localize' && (
+                        <div>
+                          <div className="flex flex-row items-center gap-4">
+                            <span>Text localization </span>
+                            <FaQuestionCircle className="text-primary mr-2" />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
-
                 {selectedSection === 'section-1' && (
-                  <div className="border border-gray-200 dark:border-gray-600 rounded-md p-4">
-                    <h3 className="text-xl font-semibold mb-4">About Section Preview</h3>
-                    <div className="flex flex-col md:flex-row gap-6">
-                      <div className="md:w-1/2">
-                        <img
-                          src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4"
-                          alt="Restaurant"
-                          className="rounded-lg h-64 w-full object-cover"
-                        />
-                      </div>
-                      <div className="md:w-1/2">
-                        <h4 className="text-2xl font-semibold mb-3">Our Story</h4>
-                        <p className="mb-4 text-gray-600 dark:text-gray-300">
-                          Founded in 2010, our restaurant has been serving authentic cuisine with a modern twist.
-                          We source only the freshest ingredients from local suppliers.
-                        </p>
-                        <button className="text-primary border border-primary px-4 py-2 rounded-md hover:bg-primary hover:text-white transition">
-                          Learn More
+                  <div className="border border-gray-200 dark:border-gray-600 rounded-md">
+                    <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-600">
+                      <h3 className="text-lg bg-gray-100 rounded-sm px-3 py-3 font-semibold">Hero Section</h3>
+                      <button className="bg-secondary hover:bg-primary cursor-pointer text-white px-4 py-3 rounded-sm font-medium hover:bg-opacity-90 transition">
+                        Save
+                      </button>
+                    </div>
+                    {/* Configuration and Localize tabs */}
+                    <div className="border-b border-gray-200 dark:border-gray-600">
+                      <div className="flex">
+                        <button
+                          onClick={() => setActiveTabs('configuration')}
+                          className={`px-4 py-2 font-medium ${activeTabs === 'configuration'
+                            ? 'border-b-2 border-primary text-primary'
+                            : 'text-gray-500 dark:text-gray-400'
+                            }`}
+                        >
+                          Configuration
+                        </button>
+                        <button
+                          onClick={() => setActiveTabs('localize')}
+                          className={`px-4 py-2 font-medium ${activeTabs === 'localize'
+                            ? 'border-b-2 border-primary text-primary'
+                            : 'text-gray-500 dark:text-gray-400'
+                            }`}
+                        >
+                          Localize
                         </button>
                       </div>
+                    </div>
+                    <div className="p-4">
+                      {activeTabs === 'configuration' && (
+                        <div className="border border-gray-200 dark:border-gray-600 rounded-md p-4">
+                          <h3 className="text-lg text-gray-500 mb-4">Image <span className="text-red-400">*</span></h3>
+                          <div className="flex flex-col md:flex-col gap-6">
+                            <div className="md:w-1/2">
+                              <img
+                                src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4"
+                                alt="Restaurant"
+                                className="rounded-lg h-52 w-full object-cover"
+                              />
+                            </div>
+                            <div className="md:w-1/2 space-y-4">
+                              <div className={`flex items-center border ${focusedField === 'name' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'} rounded-md transition-colors`}>
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3 py-2 border-r border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 whitespace-nowrap">
+                                  Heading  <span className="text-red-500">*</span>
+                                </span>
+                                <input
+                                  type="text"
+                                  name="name"
+                                  value={promotionData.name}
+                                  onChange={handleInputChange}
+                                  onFocus={() => handleFocus('name')}
+                                  onBlur={handleBlur}
+                                  className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none rounded-r-md"
+                                  placeholder="Enter promotion name"
+                                />
+                              </div>
+                              {/* Description */}
+                              <div className={`flex flex-col border ${focusedField === 'description' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'} rounded-md transition-colors`}>
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3 py-2 border-b border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
+                                  Description <span className="text-red-500">*</span>
+                                </span>
+                                <textarea
+                                  name="description"
+                                  value={promotionData.description}
+                                  onChange={handleInputChange}
+                                  onFocus={() => handleFocus('description')}
+                                  onBlur={handleBlur}
+                                  className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none rounded-b-md"
+                                  placeholder="Enter description"
+                                  rows={3}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {activeTabs === 'localize' && (
+                        <div>
+                          <div className="flex flex-row items-center gap-4">
+                            <span>Text localization </span>
+                            <FaQuestionCircle className="text-primary mr-2" />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
 
                 {selectedSection === 'section-2' && (
-                  <div className="border border-gray-200 dark:border-gray-600 rounded-md p-4">
-                    <h3 className="text-xl font-semibold mb-4">Featured Food Preview</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {[1, 2, 3].map(item => (
-                        <div key={item} className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden hover:shadow-md transition">
-                          <img
-                            src={`https://source.unsplash.com/random/300x200/?food,${item}`}
-                            alt={`Food ${item}`}
-                            className="w-full h-40 object-cover"
-                          />
-                          <div className="p-4">
-                            <h4 className="font-semibold">Featured Dish {item}</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">$12.{item}9</p>
+                  <div className="border border-gray-200 dark:border-gray-600 rounded-md">
+                    <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-600">
+                      <h3 className="text-lg bg-gray-100 rounded-sm px-3 py-3 font-semibold">Hero Section</h3>
+                      <button className="bg-secondary hover:bg-primary cursor-pointer text-white px-4 py-3 rounded-sm font-medium hover:bg-opacity-90 transition">
+                        Save
+                      </button>
+                    </div>
+                    {/* Configuration and Localize tabs */}
+                    {/* Configuration and Localize tabs */}
+                    <div className="border-b border-gray-200 dark:border-gray-600">
+                      <div className="flex">
+                        <button
+                          onClick={() => setActiveTabs('configuration')}
+                          className={`px-4 py-2 font-medium ${activeTabs === 'configuration'
+                            ? 'border-b-2 border-primary text-primary'
+                            : 'text-gray-500 dark:text-gray-400'
+                            }`}
+                        >
+                          Configuration
+                        </button>
+                        <button
+                          onClick={() => setActiveTabs('localize')}
+                          className={`px-4 py-2 font-medium ${activeTabs === 'localize'
+                            ? 'border-b-2 border-primary text-primary'
+                            : 'text-gray-500 dark:text-gray-400'
+                            }`}
+                        >
+                          Localize
+                        </button>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      {activeTabs === 'configuration' && (
+                        <div className="md:w-1/2 space-y-4">
+                          <div className={`flex items-center border ${focusedField === 'name' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'} rounded-md transition-colors`}>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3 py-2 border-r border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 whitespace-nowrap">
+                              Heading  <span className="text-red-500">*</span>
+                            </span>
+                            <input
+                              type="text"
+                              name="name"
+                              value={promotionData.name}
+                              onChange={handleInputChange}
+                              onFocus={() => handleFocus('name')}
+                              onBlur={handleBlur}
+                              className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none rounded-r-md"
+                              placeholder="Enter promotion name"
+                            />
+                          </div>
+                          {/* Description */}
+                          <div className={`flex flex-col border ${focusedField === 'description' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'} rounded-md transition-colors`}>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3 py-2 border-b border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
+                              Description <span className="text-red-500">*</span>
+                            </span>
+                            <textarea
+                              name="description"
+                              value={promotionData.description}
+                              onChange={handleInputChange}
+                              onFocus={() => handleFocus('description')}
+                              onBlur={handleBlur}
+                              className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none rounded-b-md"
+                              placeholder="Enter description"
+                              rows={3}
+                            />
                           </div>
                         </div>
-                      ))}
+                      )}
+                      {activeTabs === 'localize' && (
+                        <div>
+                          <div className="flex flex-row items-center gap-4">
+                            <span>Text localization </span>
+                            <FaQuestionCircle className="text-primary mr-2" />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
 
                 {selectedSection === 'section-3' && (
-                  <div className="border border-gray-200 dark:border-gray-600 rounded-md p-4">
-                    <h3 className="text-xl font-semibold mb-4">Why Choose Us Preview</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {[
-                        { icon: '🍳', title: 'Fresh Ingredients', desc: 'Locally sourced, organic produce' },
-                        { icon: '👨‍🍳', title: 'Expert Chefs', desc: 'Years of culinary experience' },
-                        { icon: '🌟', title: 'Award Winning', desc: 'Recognized for excellence' }
-                      ].map((item, index) => (
-                        <div key={index} className="text-center p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:shadow-md transition">
-                          <div className="text-4xl mb-3">{item.icon}</div>
-                          <h4 className="font-semibold mb-2">{item.title}</h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">{item.desc}</p>
+                  <div className="border border-gray-200 dark:border-gray-600 rounded-md">
+                    <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-600">
+                      <h3 className="text-lg bg-gray-100 rounded-sm px-3 py-3 font-semibold">Hero Section</h3>
+                      <button className="bg-secondary hover:bg-primary cursor-pointer text-white px-4 py-3 rounded-sm font-medium hover:bg-opacity-90 transition">
+                        Save
+                      </button>
+                    </div>
+                    {/* Configuration and Localize tabs */}
+                    {/* Configuration and Localize tabs */}
+                    <div className="border-b border-gray-200 dark:border-gray-600">
+                      <div className="flex">
+                        <button
+                          onClick={() => setActiveTabs('configuration')}
+                          className={`px-4 py-2 font-medium ${activeTabs === 'configuration'
+                            ? 'border-b-2 border-primary text-primary'
+                            : 'text-gray-500 dark:text-gray-400'
+                            }`}
+                        >
+                          Configuration
+                        </button>
+                        <button
+                          onClick={() => setActiveTabs('localize')}
+                          className={`px-4 py-2 font-medium ${activeTabs === 'localize'
+                            ? 'border-b-2 border-primary text-primary'
+                            : 'text-gray-500 dark:text-gray-400'
+                            }`}
+                        >
+                          Localize
+                        </button>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      {activeTabs === 'configuration' && (
+                        <div className="border border-gray-200 dark:border-gray-600 rounded-md p-4">
+                          <h3 className="text-lg text-gray-500 mb-4">Image <span className="text-red-400">*</span></h3>
+                          <div className="flex flex-col md:flex-col gap-6">
+                            <div className="md:w-1/2">
+                              <img
+                                src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4"
+                                alt="Restaurant"
+                                className="rounded-lg h-52 w-full object-cover"
+                              />
+                            </div>
+                            <div className="md:w-1/2 space-y-4">
+                              <div className={`flex items-center border ${focusedField === 'name' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'} rounded-md transition-colors`}>
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3 py-2 border-r border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 whitespace-nowrap">
+                                  Heading  <span className="text-red-500">*</span>
+                                </span>
+                                <input
+                                  type="text"
+                                  name="name"
+                                  value={promotionData.name}
+                                  onChange={handleInputChange}
+                                  onFocus={() => handleFocus('name')}
+                                  onBlur={handleBlur}
+                                  className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none rounded-r-md"
+                                  placeholder="Enter promotion name"
+                                />
+                              </div>
+                              {/* Description */}
+                              <div className={`flex flex-col border ${focusedField === 'description' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'} rounded-md transition-colors`}>
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3 py-2 border-b border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
+                                  Description <span className="text-red-500">*</span>
+                                </span>
+                                <textarea
+                                  name="description"
+                                  value={promotionData.description}
+                                  onChange={handleInputChange}
+                                  onFocus={() => handleFocus('description')}
+                                  onBlur={handleBlur}
+                                  className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none rounded-b-md"
+                                  placeholder="Enter description"
+                                  rows={3}
+                                />
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      ))}
+                      )}
+                      {activeTabs === 'localize' && (
+                        <div>
+                          <div className="flex flex-row items-center gap-4">
+                            <span>Text localization </span>
+                            <FaQuestionCircle className="text-primary mr-2" />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
 
                 {selectedSection === 'section-4' && (
-                  <div className="border border-gray-200 dark:border-gray-600 rounded-md p-4">
-                    <h3 className="text-xl font-semibold mb-4">Newsletter Preview</h3>
-                    <div className="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg text-center">
-                      <h4 className="text-xl font-semibold mb-2">Subscribe to Our Newsletter</h4>
-                      <p className="mb-4 text-gray-600 dark:text-gray-300">Get updates on special offers and events</p>
-                      <div className="flex max-w-md mx-auto">
-                        <input
-                          type="email"
-                          placeholder="Your email address"
-                          className="flex-grow px-4 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-1 focus:ring-primary"
-                        />
-                        <button className="bg-primary text-white px-6 py-2 rounded-r-md hover:bg-opacity-90 transition">
-                          Subscribe
+                  <div className="border border-gray-200 dark:border-gray-600 rounded-md">
+                    <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-600">
+                      <h3 className="text-lg bg-gray-100 rounded-sm px-3 py-3 font-semibold">Hero Section</h3>
+                      <button className="bg-secondary hover:bg-primary cursor-pointer text-white px-4 py-3 rounded-sm font-medium hover:bg-opacity-90 transition">
+                        Save
+                      </button>
+                    </div>
+                    {/* Configuration and Localize tabs */}
+                    {/* Configuration and Localize tabs */}
+                    <div className="border-b border-gray-200 dark:border-gray-600">
+                      <div className="flex">
+                        <button
+                          onClick={() => setActiveTabs('configuration')}
+                          className={`px-4 py-2 font-medium ${activeTabs === 'configuration'
+                            ? 'border-b-2 border-primary text-primary'
+                            : 'text-gray-500 dark:text-gray-400'
+                            }`}
+                        >
+                          Configuration
+                        </button>
+                        <button
+                          onClick={() => setActiveTabs('localize')}
+                          className={`px-4 py-2 font-medium ${activeTabs === 'localize'
+                            ? 'border-b-2 border-primary text-primary'
+                            : 'text-gray-500 dark:text-gray-400'
+                            }`}
+                        >
+                          Localize
                         </button>
                       </div>
+                    </div>
+                    <div className="p-4">
+                      {activeTabs === 'configuration' && (
+                        <div className="md:w-1/2 space-y-4">
+                          <div className={`flex items-center border ${focusedField === 'name' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'} rounded-md transition-colors`}>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3 py-2 border-r border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 whitespace-nowrap">
+                              Heading  <span className="text-red-500">*</span>
+                            </span>
+                            <input
+                              type="text"
+                              name="name"
+                              value={promotionData.name}
+                              onChange={handleInputChange}
+                              onFocus={() => handleFocus('name')}
+                              onBlur={handleBlur}
+                              className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none rounded-r-md"
+                              placeholder="Enter promotion name"
+                            />
+                          </div>
+                          {/* Description */}
+                          <div className={`flex flex-col border ${focusedField === 'description' ? 'border-primary' : 'border-gray-300 dark:border-gray-600'} rounded-md transition-colors`}>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3 py-2 border-b border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
+                              Description <span className="text-red-500">*</span>
+                            </span>
+                            <textarea
+                              name="description"
+                              value={promotionData.description}
+                              onChange={handleInputChange}
+                              onFocus={() => handleFocus('description')}
+                              onBlur={handleBlur}
+                              className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none rounded-b-md"
+                              placeholder="Enter description"
+                              rows={3}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {activeTabs === 'localize' && (
+                        <div>
+                          <div className="flex flex-row items-center gap-4">
+                            <span>Text localization </span>
+                            <FaQuestionCircle className="text-primary mr-2" />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -365,7 +711,7 @@ function Website() {
                     className="h-12 rounded-md flex items-center px-4 text-white font-medium"
                     style={{ backgroundColor: primaryColor }}
                   >
-                    {themes[selectedTheme].name} Theme
+                    {themes[selectedTheme]?.name || "Custom Theme"} {/* Fallback if theme not found */}
                   </div>
                 </div>
 
