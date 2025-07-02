@@ -439,8 +439,7 @@ function Promotion() {
             </div>
 
             {/* Table with headers */}
-            {/* Table with headers */}
-            <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+            <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
@@ -480,8 +479,8 @@ function Promotion() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <span className={`px-3 py-1 rounded-sm text-xs font-medium ${promo.status === "Active"
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                               }`}>
                               {promo.status}
                             </span>

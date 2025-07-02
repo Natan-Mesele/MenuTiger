@@ -485,7 +485,6 @@ function HotActions() {
         {activeTab === "requests" && (
           <div className="space-y-4">
             {/* Filter Controls (above the table) */}
-            {/* Filter Controls (above the table) */}
             <div className="flex flex-wrap w-full gap-4 mb-4">
               {/* Date Range Buttons - full width on small screens, fit content on larger */}
               <div className="flex flex-1 gap-2">
@@ -547,8 +546,8 @@ function HotActions() {
               </div>
             </div>
             {/* Table starts below this line only */}
-            <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
-              <table className="min-w-full text-left text-sm">
+            <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead>
                   <tr className="text-gray-700 dark:text-gray-200 cursor-pointer border-b border-gray-300 dark:border-gray-600">
                     {[

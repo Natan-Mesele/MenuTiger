@@ -350,8 +350,8 @@ function Integration() {
                   </div>
                   {/* Table or Empty Message */}
                   {customPayments.length > 0 ? (
-                    <div className="border rounded-lg overflow-hidden">
-                      <table className="w-full">
+                    <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead className="bg-gray-100 dark:bg-gray-700">
                           <tr>
                             <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Name</th>

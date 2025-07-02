@@ -64,7 +64,6 @@ function Customers() {
                 </div>
 
                 {/* Table Section */}
-                {/* Table Section */}
                 <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead className="">

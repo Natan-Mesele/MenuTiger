@@ -105,6 +105,7 @@ const extraItems = [
     name: "Download E-book",
     iconUrl:
       "https://www.app.menutigr.com/static/media/faq.6964d233624dd577e627d27843ddbece.svg",
+    url: "https://www.menutiger.com/ebooks"
   },
 ];
 
@@ -124,6 +125,7 @@ const DashboardLayout = () => {
   const [language, setLanguage] = useState("EN");
   const [showStep, setShowStep] = useState('welcome');
   const [showChecklist, setShowChecklist] = React.useState(false);
+  const [showVideoPopup, setShowVideoPopup] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
@@ -387,11 +389,18 @@ const DashboardLayout = () => {
               </div>
             );
           })}
-          {extraItems.map(({ name, iconUrl }) => (
+          {extraItems.map(({ name, iconUrl, url }) => (
             <a
               key={name}
-              href="#!"
-              onClick={(e) => e.preventDefault()}
+              href={url || "#!"}
+              onClick={(e) => {
+                e.preventDefault();
+                if (name === "Onboarding Video") {
+                  setShowVideoPopup(true);
+                } else if (url) {
+                  window.open(url, "_blank");
+                }
+              }}
               title={name}
               className="relative flex items-center px-2 py-6 mb-2 text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap group overflow-hidden rounded-lg"
               style={{
@@ -402,33 +411,65 @@ const DashboardLayout = () => {
               <div
                 className="absolute top-0 right-0 w-24 h-24 pointer-events-none"
                 style={{
-                  background: "radial-gradient(circle at top right, #8591a1 30%, transparent 70%)",
+                  background:
+                    "radial-gradient(circle at top right, #8591a1 30%, transparent 70%)",
                   borderBottomLeftRadius: "100%",
                   opacity: 0.4,
                 }}
               />
 
-              <div className="flex items-center justify-center w-10 relative z-10">
-                <img
-                  src={iconUrl}
-                  alt={name}
-                  className="mr-3"
-                  style={{
-                    minWidth: "24px",
-                    width: "20px",
-                    height: "20px",
-                    objectFit: "contain",
-                  }}
-                />
+              {/* Icon Container */}
+              <div className="flex items-center justify-center bg-white w-11 h-11 rounded-md relative z-10">
+                {name === "Onboarding Video" ? (
+                  <img
+                    src={iconUrl}
+                    alt={name}
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      objectFit: "contain",
+                    }}
+                  />
+                ) : name === "Download E-book" ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-green-500"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M8 17l4 4 4-4"></path>
+                    <path d="M12 12v9"></path>
+                    <path d="M20.39 18.39A5.5 5.5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+                  </svg>
+                ) : (
+                  <img
+                    src={iconUrl}
+                    alt={name}
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      objectFit: "contain",
+                    }}
+                  />
+                )}
               </div>
 
+              {/* Sidebar Text */}
               {sidebarOpen && (
-                <span className="sidebar-text transition-all duration-200 relative z-10">
+                <span className="sidebar-text transition-all duration-200 relative z-10 ml-3">
                   {name}
                 </span>
               )}
             </a>
           ))}
+
+
         </nav>
       </aside>
 
@@ -447,14 +488,19 @@ const DashboardLayout = () => {
         <header className="flex items-center justify-between bg-white dark:bg-gray-800 shadow px-4 sm:px-12 h-20 fixed top-0 left-0 right-0 z-5">
           {/* Left: Sidebar toggle */}
           <div className="flex items-center justify-between space-x-20">
+            {/* Logo - hidden on mobile */}
             <img
               src={downloadLogo}
               alt="Logo"
-              className={`h-8 transition-all duration-300 ${sidebarOpen ? "block" : "hidden"
+              className={`h-8 transition-all duration-300 ${sidebarOpen ? "block" : "hidden"} ${isMobile ? "hidden" : "block" /* Hide completely on mobile */
                 }`}
             />
             {!sidebarOpen && (
-              <img src={downloadLogo} alt="Logo Small" className="h-10" />
+              <img
+                src={downloadLogo}
+                alt="Logo Small"
+                className={`h-10 ${isMobile ? "hidden" : "block"}`} /* Hide on mobile */
+              />
             )}
             <div className="flex items-center space-x-4">
               <button
@@ -476,10 +522,7 @@ const DashboardLayout = () => {
                 className={`relative flex items-center justify-between w-16 h-6 rounded-full p-1 transition-colors duration-300 focus:outline-none ${darkMode ? 'bg-gray-600' : 'bg-gray-300'}`}
                 title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
               >
-                {/* Very subtle horizontal line */}
                 <span className="absolute inset-0 w-full h-0.5 bg-gray-400 dark:bg-gray-500 rounded-full m-auto opacity-20"></span>
-
-                {/* Large circular toggle with secondary color */}
                 <span
                   className={`relative z-10 w-10 h-10 rounded-full shadow-md transform transition-transform duration-300 flex items-center justify-center ${darkMode
                     ? 'translate-x-6 bg-secondary text-white'
@@ -496,7 +539,7 @@ const DashboardLayout = () => {
             </div>
 
             {/* Translate */}
-            <div className="relative flex justify-center">
+            <div className={`relative flex justify-center ${isMobile ? "hidden" : "flex"}`}>
               <div className="relative">
                 <button
                   onClick={toggleLanguageDropdown}
@@ -628,7 +671,8 @@ const DashboardLayout = () => {
             <button
               onClick={() => setShowProductTour(true)}
               title="Product Tour"
-              className="text-gray-700 dark:text-gray-300 bg-fifth rounded-md p-2 hover:bg-secondary hover:text-white transition-colors duration-200 cursor-pointer"
+              className={`text-gray-700 dark:text-gray-300 bg-fifth rounded-md p-2 hover:bg-secondary hover:text-white transition-colors duration-200 cursor-pointer ${isMobile ? "hidden" : "block"
+                }`}
             >
               <FaFlag size={24} />
             </button>
@@ -799,7 +843,8 @@ const DashboardLayout = () => {
             {/* Open Preview */}
             <button
               title="Open Preview"
-              className="text-gray-700 dark:text-gray-300 bg-fifth rounded-md p-2 hover:bg-secondary hover:text-white transition-colors duration-200 cursor-pointer"
+              className={`text-gray-700 dark:text-gray-300 bg-fifth rounded-md p-2 hover:bg-secondary hover:text-white transition-colors duration-200 cursor-pointer ${isMobile ? "hidden" : "block"
+                }`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -821,7 +866,8 @@ const DashboardLayout = () => {
             <button
               onClick={toggleFullScreen}
               title="Full Screen"
-              className="text-gray-700 dark:text-gray-300 bg-fifth rounded-md p-2 hover:bg-secondary hover:text-white transition-colors duration-200 cursor-pointer"
+              className={`text-gray-700 dark:text-gray-300 bg-fifth rounded-md p-2 hover:bg-secondary hover:text-white transition-colors duration-200 cursor-pointer ${isMobile ? "hidden" : "block"
+                }`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -958,9 +1004,7 @@ const DashboardLayout = () => {
                             <span>{filter}</span>
                           </button>
                         ))}
-
                       </div>
-
                       <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                         <p className="text-sm text-gray-500 dark:text-gray-400">MENU TIGER feed by Beamer</p>
                       </div>
@@ -991,7 +1035,7 @@ const DashboardLayout = () => {
                 />
               </button>
               {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-full sm:w-96 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 z-20 border border-gray-200 dark:border-gray-600">
+                <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 z-20 border border-gray-200 dark:border-gray-600">
                   {/* Header */}
                   <div className="px-4 pt-3 pb-2">
                     <p className="text-lg sm:text-md font-medium text-gray-800 dark:text-gray-200">
@@ -1067,6 +1111,49 @@ const DashboardLayout = () => {
         <main className="flex-grow pt-16">
           {renderContent()}
         </main>
+        {/* Video Popup Modal */}
+        {showVideoPopup && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30 dark:bg-gray-900/70 backdrop-blur-sm">
+            <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl mx-4 overflow-hidden border border-gray-200 dark:border-gray-700">
+              {/* Close Button Inside */}
+              <button
+                onClick={() => setShowVideoPopup(false)}
+                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 dark:bg-gray-700/80 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors shadow-sm"
+                aria-label="Close video"
+              >
+                <FaTimes size={20} />
+              </button>
+
+              {/* Video Container with Background */}
+              <div className="relative bg-gray-100 dark:bg-gray-900 p-4">
+                <div className="aspect-w-16 aspect-h-9 w-full rounded-lg overflow-hidden">
+                  <iframe
+                    className="w-full h-[500px]"
+                    src="https://www.youtube.com/embed/wQyaIzP8190?autoplay=1&mute=1"
+                    title="Menu Tiger Onboarding Video"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+
+              {/* Video Info with Background */}
+              <div className="bg-gray-50 dark:bg-gray-800/80 p-6 border-t border-gray-200 dark:border-gray-700">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                  Welcome to Menu Tiger
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Watch this video to learn how to get started with Menu Tiger and make the most of our platform.
+                </p>
+                <div className="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                  <FaCheckCircle className="mr-2 text-green-500" />
+                  <span>Duration: 5 minutes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

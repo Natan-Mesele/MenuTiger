@@ -1032,8 +1032,8 @@ const Menu = () => {
 
               {/* Table List */}
               {!showModifierForm && (
-                <div className="border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 overflow-x-auto">
-                  <table className="min-w-full text-left text-sm text-gray-800 dark:text-gray-100">
+                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead className="bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                       <tr>
                         <th className="px-4 py-3">Group Modifier Name</th>

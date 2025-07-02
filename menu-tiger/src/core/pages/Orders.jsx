@@ -35,7 +35,7 @@ function Orders() {
   }, []);
 
   return (
-   <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
+    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6 bg-white dark:bg-gray-800 p-4 sm:p-6 shadow rounded-lg w-full">
         <div className="flex flex-col">
@@ -71,7 +71,7 @@ function Orders() {
 
       {/* Filters */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-4 sm:p-6 space-y-6 w-full">
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
           {/* Invoice Input */}
           <div className="relative w-full">
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
@@ -172,20 +172,24 @@ function Orders() {
             )}
           </div>
 
-          {/* Apply & Reset */}
-          <div className="flex flex-col sm:flex-row gap-2 w-full">
-            <button className="bg-primary text-white px-4 py-3 cursor-pointer rounded-md text-sm hover:bg-teal-700 transition w-full">
+          {/* Apply Button */}
+          <div className="w-full">
+            <button className="w-full bg-primary text-white px-4 py-3 rounded-md text-sm hover:bg-teal-700 transition">
               Apply
             </button>
-            <button className="border border-gray-300 dark:border-gray-600 cursor-pointer text-gray-700 dark:text-gray-300 px-4 py-3 rounded-md text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition w-full">
+          </div>
+
+          {/* Reset Button */}
+          <div className="w-full">
+            <button className="w-full border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-md text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">
               Reset
             </button>
           </div>
         </div>
 
         {/* Table Section */}
-        <div className="overflow-x-auto border border-gray-200 dark:border-gray-600 rounded-lg">
-          <table className="min-w-full text-left text-sm whitespace-nowrap">
+        <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead>
               <tr className="text-gray-700 dark:text-gray-200 border-b border-gray-300 dark:border-gray-600">
                 {[
@@ -197,7 +201,7 @@ function Orders() {
                   "Payment Method",
                   "Order Status",
                 ].map((header) => (
-                  <th key={header} className="px-4 py-3 font-semibold">
+                  <th key={header} className="px-4 py-3 font-semibold text-center">
                     <div className="flex items-center justify-center select-none group">
                       <span>{header}</span>
                       <FaArrowUp className="ml-1 text-xs text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />

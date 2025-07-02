@@ -1,71 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from 'react';
 import {
   FaRocket,
   FaUtensils,
-  FaTable,
-  FaUsers,
-  FaClock,
-  FaShareAlt,
-  FaWifi,
-  FaMapMarkerAlt,
+  FaUser,
+  FaBell,
   FaCog,
+  FaTools,
+  FaCreditCard,
+  FaQrcode,
+  FaLock,
   FaEllipsisV,
+  FaQuestionCircle,
+  FaArrowUp,
   FaChevronLeft,
   FaChevronDown,
   FaChevronUp,
-  FaQuestionCircle,
-  FaArrowUp,
   FaEye,
-  FaEyeSlash,
   FaEdit,
   FaTrash,
-  FaPlus
+  FaPlus,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 
 function Stores() {
-  const [activeTab, setActiveTab] = useState("tables");
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [tabOffset, setTabOffset] = useState(0);
-  const [showTableForm, setShowTableForm] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    id: null,
-  });
-  const [savedSchedulers, setSavedSchedulers] = useState([]);
-  const [showQRCustomization, setShowQRCustomization] = useState(false);
-  const [activeDesignTab, setActiveDesignTab] = useState(null);
-  const selectedStore = { id: 1, name: "Main Restaurant" };
-  const [selectedLogo, setSelectedLogo] = useState(null);
-  const [selectedPattern, setSelectedPattern] = useState(null);
-  const [selectedEyeStyle, setSelectedEyeStyle] = useState(null);
-  const [selectedColor, setSelectedColor] = useState('#3B82F6');
-  const [selectedFrame, setSelectedFrame] = useState(null);
+  const [currentPage, setCurrentPage] = useState('profile');
   const [showUserForm, setShowUserForm] = useState(false);
-  const [userFormData, setUserFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    role: 'Staff' // Default role
-  });
-  const [users, setUsers] = useState([]);
-  const [editingUserId, setEditingUserId] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showTableForm, setShowTableForm] = useState(false);
+  const [showQRCustomization, setShowQRCustomization] = useState(false);
+  const [savedSchedulers, setSavedSchedulers] = useState([]);
+  const [selectedPattern, setSelectedPattern] = useState(null);
+  const [locationEnabled, setLocationEnabled] = useState(false);
   const [radiusValue, setRadiusValue] = useState(20);
   const [takeawayEnabled, setTakeawayEnabled] = useState(false);
   const [dineInEnabled, setDineInEnabled] = useState(false);
   const [allowSpecialInstructions, setAllowSpecialInstructions] = useState(false);
   const [displayFullFoodName, setDisplayFullFoodName] = useState(false);
   const [storeMenu, setStoreMenu] = useState('');
-
-  const tabItems = [
-    { id: "tables", icon: <FaTable />, label: "Tables" },
-    { id: "users", icon: <FaUsers />, label: "Users" },
-    { id: "opening", icon: <FaClock />, label: "Opening Hours" },
-    { id: "social", icon: <FaShareAlt />, label: "Social Accounts" },
-    { id: "wifi", icon: <FaWifi />, label: "WiFi" },
-    { id: "location", icon: <FaMapMarkerAlt />, label: "Location" },
-    { id: "settings", icon: <FaCog />, label: "Settings" },
+  const [selectedEyeStyle, setSelectedEyeStyle] = useState(null);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [editingUserId, setEditingUserId] = useState(null);
+  const [selectedColor, setSelectedColor] = useState('#3B82F6');
+  const [selectedFrame, setSelectedFrame] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [selectedLogo, setSelectedLogo] = useState(null);
+  const [activeDesignTab, setActiveDesignTab] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    id: null,
+  });
+  const [userFormData, setUserFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    role: 'Staff' // Default role
+  });
+  const tabs = [
+    { id: 'tables', name: 'Tables', icon: <FaUser /> },
+    { id: 'users', name: 'Users', icon: <FaUtensils /> },
+    { id: 'hours', name: 'Opening Hours', icon: <FaBell /> },
+    { id: 'social', name: 'Social Accounts', icon: <FaCog /> },
+    { id: 'wifi', name: 'WiFi', icon: <FaTools /> },
+    { id: 'location', name: 'Location Details', icon: <FaCreditCard /> },
+    { id: 'settings', name: 'Settings', icon: <FaQrcode /> },
   ];
 
   const designTabs = [
@@ -98,28 +95,40 @@ function Stores() {
     }
   ];
 
-  const visibleTabs = 5;
-  const maxOffset = Math.max(0, tabItems.length - visibleTabs);
 
-  const handlePrevTab = () => setTabOffset(Math.max(0, tabOffset - 1));
-  const handleNextTab = () => setTabOffset(Math.min(maxOffset, tabOffset + 1));
-  const getVisibleTabItems = () => tabItems.slice(tabOffset, tabOffset + visibleTabs);
-  const [locationEnabled, setLocationEnabled] = useState(false);
-  const handleUserInputChange = (e) => {
-    const { name, value } = e.target;
-    setUserFormData(prev => ({ ...prev, [name]: value }));
-  };
+  const tabsRef = useRef([]);
+  const containerRef = useRef(null);
+  const [visibleStartIndex, setVisibleStartIndex] = useState(0);
+  const [visibleTabsCount, setVisibleTabsCount] = useState(5);
 
-  const [openingHours, setOpeningHours] = useState({
-    Monday: { isActive: true, slots: [{ from: '09:00', to: '17:00' }] },
-    Tuesday: { isActive: true, slots: [{ from: '09:00', to: '17:00' }] },
-    // ... repeat for all days
-  });
+  useEffect(() => {
+    const calculateVisibleTabs = () => {
+      if (!containerRef.current) return;
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+      const containerWidth = containerRef.current.offsetWidth;
+      let totalWidth = 0;
+      let count = 0;
+
+      for (let i = 0; i < tabs.length; i++) {
+        const tabWidth = tabsRef.current[i]?.offsetWidth || 120;
+        if (totalWidth + tabWidth <= containerWidth) {
+          totalWidth += tabWidth;
+          count++;
+        } else {
+          break;
+        }
+      }
+
+      setVisibleTabsCount(Math.max(1, count));
+    };
+
+    calculateVisibleTabs();
+    window.addEventListener('resize', calculateVisibleTabs);
+
+    return () => {
+      window.removeEventListener('resize', calculateVisibleTabs);
+    };
+  }, []);
 
   const handleSave = () => {
     if (!formData.name.trim()) {
@@ -143,6 +152,11 @@ function Stores() {
     setFormData({ name: "", id: null });
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleEdit = (id) => {
     const itemToEdit = savedSchedulers.find(item => item.id === id);
     if (itemToEdit) {
@@ -156,28 +170,6 @@ function Stores() {
 
   const handleDelete = (id) => {
     setSavedSchedulers(savedSchedulers.filter(item => item.id !== id));
-  };
-
-  const handleEditUser = (id) => {
-    const userToEdit = users.find(user => user.id === id);
-    if (userToEdit) {
-      setUserFormData({
-        firstName: userToEdit.firstName,
-        lastName: userToEdit.lastName,
-        email: userToEdit.email,
-        password: '',
-        confirmPassword: '',
-        accessLevel: userToEdit.accessLevel
-      });
-      setEditingUserId(id);
-      setShowUserForm(true);
-    }
-  };
-
-  const handleDeleteUser = (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      setUsers(users.filter(user => user.id !== id));
-    }
   };
 
   const handleSaveUser = () => {
@@ -210,19 +202,68 @@ function Stores() {
     });
   };
 
-  const handleSaveOpeningHours = async () => {
-    try {
-      // Here you would typically send the data to your backend
-      console.log('Saving opening hours:', openingHours);
-      // const response = await api.saveOpeningHours(openingHours);
-      alert('Opening hours saved successfully!');
-    } catch (error) {
-      console.error('Error saving opening hours:', error);
-      alert('Failed to save opening hours');
+  const handleUserInputChange = (e) => {
+    const { name, value } = e.target;
+    setUserFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditUser = (id) => {
+    const userToEdit = users.find(user => user.id === id);
+    if (userToEdit) {
+      setUserFormData({
+        firstName: userToEdit.firstName,
+        lastName: userToEdit.lastName,
+        email: userToEdit.email,
+        password: '',
+        confirmPassword: '',
+        accessLevel: userToEdit.accessLevel
+      });
+      setEditingUserId(id);
+      setShowUserForm(true);
     }
   };
 
-  // QR Customization Sub-Components
+  const handleDeleteUser = (id) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      setUsers(users.filter(user => user.id !== id));
+    }
+  };
+
+  const QRPreviewSection = () => (
+    <div className="mb-6 flex flex-col items-center">
+      <h4 className="font-medium mb-3 text-gray-700">QR Code Preview</h4>
+      <div className="p-4 bg-white rounded-lg">
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://example.com&margin=10"
+          alt="QR Code Preview"
+          className="w-48 h-48"
+        />
+      </div>
+      <button className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
+        Download QR Code
+      </button>
+    </div>
+  );
+
+  const ScanReminderSection = () => (
+    <div className="bg-yellow-50 rounded-lg p-4">
+      <div className="flex items-start gap-3">
+        <div className="bg-yellow-100 p-2 rounded-full flex-shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-600" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <div>
+          <h4 className="font-semibold text-gray-800 mb-1">Always test your QR code</h4>
+          <p className="text-sm text-gray-600">
+            Scan with multiple devices to ensure it works properly before distribution.
+            <span className="block mt-1 text-blue-600 hover:underline cursor-pointer">Learn more about testing →</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   const LogoUploadSection = () => (
     <div>
       <label className="block text-sm font-medium mb-2">Upload Center Logo</label>
@@ -364,52 +405,17 @@ function Stores() {
     </div>
   );
 
-  const QRPreviewSection = () => (
-    <div className="mb-6 flex flex-col items-center">
-      <h4 className="font-medium mb-3 text-gray-700">QR Code Preview</h4>
-      <div className="p-4 bg-white rounded-lg">
-        <img
-          src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://example.com&margin=10"
-          alt="QR Code Preview"
-          className="w-48 h-48"
-        />
-      </div>
-      <button className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
-        Download QR Code
-      </button>
-    </div>
-  );
-
-  const ScanReminderSection = () => (
-    <div className="bg-yellow-50 rounded-lg p-4">
-      <div className="flex items-start gap-3">
-        <div className="bg-yellow-100 p-2 rounded-full flex-shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-600" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
-          </svg>
-        </div>
-        <div>
-          <h4 className="font-semibold text-gray-800 mb-1">Always test your QR code</h4>
-          <p className="text-sm text-gray-600">
-            Scan with multiple devices to ensure it works properly before distribution.
-            <span className="block mt-1 text-blue-600 hover:underline cursor-pointer">Learn more about testing →</span>
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 sm:gap-0 mb-6 bg-white dark:bg-gray-800 p-6 shadow-lg rounded-lg">
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">Scheduler</h1>
+            <h1 className="text-2xl font-bold">Integrations</h1>
             <FaRocket className="text-primary text-lg sm:text-xl" />
           </div>
           <span className="text-sm sm:text-base text-gray-700 dark:text-gray-300 mt-1">
-            Organize Task
+            Manage integrations
           </span>
         </div>
         <div className="flex items-center space-x-4 border border-gray-300 dark:border-gray-600 rounded-md p-2">
@@ -433,1039 +439,995 @@ function Stores() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-        <div className="flex flex-col lg:flex-row border-b border-gray-200 dark:border-gray-700">
-          {/* Left Side */}
-          <div className="w-full lg:w-1/4 p-4 border-r border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between gap-2 border-b border-gray-200 dark:border-gray-700 pb-3">
-              <span className="font-medium text-gray-800 dark:text-gray-200 border border-gray-300 rounded-sm px-6 py-3 w-48 text-left">
-                Store
-              </span>
-              <div className="bg-gray-300 px-3 py-3 rounded-sm">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-gray-500 dark:text-gray-400"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
+      {/* Unified Container with Responsive Layout */}
+      <div className="flex flex-col md:flex-row bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        {/* Sidebar */}
+        <div className="w-full md:w-40 p-3 flex flex-col md:items-center space-y-6 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
+          <div className='flex flex-row justify-between items-center w-full'>
+            <div className="flex-1 border border-gray-300 px-4 py-3 rounded-md overflow-hidden">
+              <span className="text-xs md:text-sm text-gray-700 dark:text-gray-300 font-semibold whitespace-nowrap">Stores</span>
             </div>
-            <div className="group relative flex items-center justify-between border border-gray-300  dark:bg-gray-700 px-3 py-3 rounded-sm mt-3">
-              <span className="font-medium">Main Restaurant</span>
-              <button
-                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                onClick={() => setShowDropdown(!showDropdown)}
-              >
-                <FaEllipsisV />
-              </button>
-
-              {showDropdown && (
-                <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700">
-                  <div className="py-1">
-                    <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-                      <img
-                        src="https://www.app.menutigr.com/static/media/edit.15f245273e71fb843eeb7281dec04a52.svg"
-                        alt="Edit"
-                        className="h-4 w-4 mr-2"
-                      />
-                      Update
-                    </button>
-                    <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-                      <img
-                        src="https://www.app.menutigr.com/static/media/delete.f9fb3a4cc8c70107a50718ec2199a285.svg"
-                        alt="Delete"
-                        className="h-4 w-4 mr-2"
-                      />
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              )}
+            <div className="ml-2 flex-shrink-0 bg-gray-200 rounded-md p-3">
+              <FaLock className="text-xl text-gray-500" />
             </div>
           </div>
-          {/* Right Side */}
-          <div className="flex-1 flex flex-col">
-            {/* Tab Navigation */}
-            <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 relative">
+          <div className="w-full">
+            <button className="text-gray-500 dark:text-gray-300 hover:text-primary border border-gray-300 rounded-md px-4 py-3 flex justify-between items-center w-full">
+              <span className="text-sm">More</span>
+              <FaEllipsisV className="text-lg" />
+            </button>
+          </div>
+        </div>
+        {/* Tabs and Content */}
+        <div className="flex-1">
+          {/* Tabs */}
+          <div className="relative border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center">
+              {/* Left Arrow */}
               <button
-                className="p-2 rounded-md cursor-pointer disabled:opacity-50"
-                onClick={handlePrevTab}
-                disabled={tabOffset === 0}
+                className="px-2 py-3 text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary disabled:opacity-30"
+                disabled={visibleStartIndex === 0}
+                onClick={() => setVisibleStartIndex(Math.max(0, visibleStartIndex - 1))}
               >
-                <FaChevronLeft />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
               </button>
 
-              <div className="flex items-center gap-2 overflow-hidden">
-                {getVisibleTabItems().map((tab) => (
+              <div ref={containerRef} className="flex flex-1 overflow-x-hidden w-full">
+                {tabs.slice(visibleStartIndex, visibleStartIndex + visibleTabsCount).map((tab, index) => (
                   <button
                     key={tab.id}
-                    className={`flex flex-col items-center px-4 py-2 transition-colors duration-200 relative
-                      ${activeTab === tab.id
-                        ? 'text-primary'
-                        : 'text-gray-800 dark:text-gray-100 hover:text-gray-600 dark:hover:text-gray-300'}`}
-                    onClick={() => setActiveTab(tab.id)}
+                    ref={el => tabsRef.current[index] = el}
+                    className={`px-4 py-3 font-medium text-sm cursor-pointer flex-shrink-0 flex items-center ${currentPage === tab.id
+                      ? 'text-primary border-b-2 border-primary'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    onClick={() => setCurrentPage(tab.id)}
                   >
-                    <div className="flex items-center gap-2">
-                      {React.cloneElement(tab.icon, {
-                        className: `transition-colors duration-200 ${activeTab === tab.id ? 'text-primary' : 'text-current'
-                          }`
-                      })}
-                      <span>{tab.label}</span>
-                    </div>
-                    <div className={`absolute bottom-0 left-0 right-0 h-0.5 transition-colors duration-200 ${activeTab === tab.id
-                      ? 'bg-primary -mb-[1px] z-10'
-                      : 'bg-transparent group-hover:bg-gray-400 dark:group-hover:bg-gray-500'
-                      }`}></div>
+                    <span className="mr-2">{tab.icon}</span>
+                    <span>{tab.name}</span>
                   </button>
                 ))}
               </div>
 
+              {/* Right Arrow */}
               <button
-                className="p-2 rounded-md cursor-pointer disabled:opacity-50"
-                onClick={handleNextTab}
-                disabled={tabOffset === maxOffset}
+                className="px-2 py-3 text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary disabled:opacity-30"
+                disabled={visibleStartIndex + visibleTabsCount >= tabs.length}
+                onClick={() => setVisibleStartIndex(Math.min(tabs.length - visibleTabsCount, visibleStartIndex + 1))}
               >
-                <FaChevronLeft className="rotate-180" />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                </svg>
               </button>
             </div>
+          </div>
 
-            {/* Tab Content */}
-            <div className="flex-1 p-6 overflow-auto">
-              {activeTab === "tables" && (
-                <div>
-                  {showTableForm ? (
-                    <div>
-                      <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700 w-full">
-                        <div className="flex items-center space-x-3">
-                          <button
-                            className="bg-primary text-white p-2 rounded-md hover:bg-teal-700 transition cursor-pointer flex items-center justify-center w-10 h-10"
-                            onClick={() => setShowTableForm(false)}
-                            aria-label="Back"
-                            title="Back"
-                          >
-                            <FaChevronLeft />
-                          </button>
-
-                          <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md select-none">
-                            <span>Scheduler</span>  <span className="text-gray-400">/</span>  <span className="text-primary">{formData.id ? "Edit scheduler" : "Add scheduler"}</span>
-                          </div>
-                        </div>
+          {/* Tab Content */}
+          <div className="p-6">
+            {currentPage === 'tables' && (
+              <div>
+                {showTableForm ? (
+                  <div>
+                    <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700 w-full">
+                      <div className="flex items-center space-x-3">
                         <button
-                          className="bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer"
-                          onClick={handleSave}
+                          className="bg-primary text-white p-2 rounded-md hover:bg-teal-700 transition cursor-pointer flex items-center justify-center w-10 h-10"
+                          onClick={() => setShowTableForm(false)}
+                          aria-label="Back"
+                          title="Back"
                         >
-                          Save
+                          <FaChevronLeft />
                         </button>
-                      </div>
 
-                      <div className="space-y-6 max-w-sm">
-                        <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus-within:border-primary transition-colors">
-                          <label className="w-28 text-sm font-medium text-gray-600 dark:text-gray-300 px-3 py-2">
-                            Name <span className="text-red-500">*</span>
-                          </label>
-                          <div className="border-l border-gray-300 dark:border-gray-600 flex-1 px-3 py-2 focus-within:border-primary transition-colors">
-                            <input
-                              type="text"
-                              name="name"
-                              value={formData.name}
-                              onChange={handleInputChange}
-                              placeholder="Enter name"
-                              required
-                              className="w-full bg-transparent outline-none"
-                            />
-                          </div>
+                        <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md select-none">
+                          <span>Scheduler</span>  <span className="text-gray-400">/</span>  <span className="text-primary">{formData.id ? "Edit scheduler" : "Add scheduler"}</span>
+                        </div>
+                      </div>
+                      <button
+                        className="bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer"
+                        onClick={handleSave}
+                      >
+                        Save
+                      </button>
+                    </div>
+
+                    <div className="space-y-6 max-w-sm">
+                      <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus-within:border-primary transition-colors">
+                        <label className="w-28 text-sm font-medium text-gray-600 dark:text-gray-300 px-3 py-2">
+                          Name <span className="text-red-500">*</span>
+                        </label>
+                        <div className="border-l border-gray-300 dark:border-gray-600 flex-1 px-3 py-2 focus-within:border-primary transition-colors">
+                          <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            placeholder="Enter name"
+                            required
+                            className="w-full bg-transparent outline-none"
+                          />
                         </div>
                       </div>
                     </div>
-                  ) : showQRCustomization ? (
-                    <div>
-                      <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700 w-full">
-                        <div className="flex items-center space-x-3">
-                          <button
-                            className="bg-secondary text-white p-2 rounded-sm hover:bg-primary cursor-pointer transition flex items-center justify-center w-10 h-10"
-                            onClick={() => setShowQRCustomization(false)}
-                            aria-label="Back"
-                            title="Back"
-                          >
-                            <FaChevronLeft />
-                          </button>
-
-                          <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md select-none">
-                            <span>Tables </span> <span className="text-gray-400">/</span>{" "}
-                            <span className="text-primary">Customize QR code</span>
-                          </div>
-                          <div className="flex items-center gap-2 px-4 py-2 border border-primary dark:border-primary rounded-sm text-sm text-gray-700 dark:text-gray-300">
-                            <FaQuestionCircle className="text-primary" />
-                            <span>
-                              Customize your QR code for store tables
-                            </span>
-                          </div>
-                        </div>
+                  </div>
+                ) : showQRCustomization ? (
+                  <div>
+                    <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700 w-full">
+                      <div className="flex items-center space-x-3">
                         <button
-                          className="bg-secondary text-white px-4 py-2 rounded-sm hover:bg-primary transition cursor-pointer"
-                          onClick={() => {
-                            const qrSettings = {
-                              logo: selectedLogo,
-                              pattern: selectedPattern,
-                              eyeStyle: selectedEyeStyle,
-                              color: selectedColor,
-                              frame: selectedFrame
-                            };
-                            console.log('QR Settings Saved:', qrSettings);
-                            alert('QR settings saved successfully!');
-                          }}
+                          className="bg-secondary text-white p-2 rounded-sm hover:bg-primary cursor-pointer transition flex items-center justify-center w-10 h-10"
+                          onClick={() => setShowQRCustomization(false)}
+                          aria-label="Back"
+                          title="Back"
                         >
-                          Save
+                          <FaChevronLeft />
                         </button>
-                      </div>
-                      <div className="max-w-4xl mx-auto mt-10">
-                        <div className="flex flex-col md:flex-row">
-                          <div className="p-6 md:w-1/2">
-                            <div className="space-y-3">
-                              {designTabs.map((tab) => (
-                                <div key={tab.id} className="transition-all">
-                                  <div
-                                    className={`flex justify-between items-center p-3 cursor-pointer transition-colors ${activeDesignTab === tab.id ? 'border border-gray-200 rounded-sm' : 'border border-gray-200 rounded-sm'}`}
-                                    onClick={() => setActiveDesignTab(activeDesignTab === tab.id ? null : tab.id)}
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-lg">{tab.icon}</span>
-                                      <span className="font-medium">{tab.label}</span>
-                                    </div>
-                                    {activeDesignTab === tab.id ? (
-                                      <FaChevronUp className="text-gray-500" />
-                                    ) : (
-                                      <FaChevronDown className="text-gray-500" />
-                                    )}
-                                  </div>
 
-                                  {activeDesignTab === tab.id && (
-                                    <div className="p-4 bg-white animate-fadeIn">
-                                      {tab.id === 'logo' && <LogoUploadSection />}
-                                      {tab.id === 'pattern' && <PatternSelectionSection />}
-                                      {tab.id === 'eyes' && <EyeStyleSection />}
-                                      {tab.id === 'color' && <ColorSelectionSection />}
-                                      {tab.id === 'frame' && <FrameSelectionSection />}
-                                    </div>
+                        <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md select-none">
+                          <span>Tables </span> <span className="text-gray-400">/</span>{" "}
+                          <span className="text-primary">Customize QR code</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-2 border border-primary dark:border-primary rounded-sm text-sm text-gray-700 dark:text-gray-300">
+                          <FaQuestionCircle className="text-primary" />
+                          <span>
+                            Customize your QR code for store tables
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        className="bg-secondary text-white px-4 py-2 rounded-sm hover:bg-primary transition cursor-pointer"
+                        onClick={() => {
+                          const qrSettings = {
+                            logo: selectedLogo,
+                            pattern: selectedPattern,
+                            eyeStyle: selectedEyeStyle,
+                            color: selectedColor,
+                            frame: selectedFrame
+                          };
+                          console.log('QR Settings Saved:', qrSettings);
+                          alert('QR settings saved successfully!');
+                        }}
+                      >
+                        Save
+                      </button>
+                    </div>
+                    <div className="max-w-4xl mx-auto mt-10">
+                      <div className="flex flex-col md:flex-row">
+                        <div className="p-6 md:w-1/2">
+                          <div className="space-y-3">
+                            {designTabs.map((tab) => (
+                              <div key={tab.id} className="transition-all">
+                                <div
+                                  className={`flex justify-between items-center p-3 cursor-pointer transition-colors ${activeDesignTab === tab.id ? 'border border-gray-200 rounded-sm' : 'border border-gray-200 rounded-sm'}`}
+                                  onClick={() => setActiveDesignTab(activeDesignTab === tab.id ? null : tab.id)}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-lg">{tab.icon}</span>
+                                    <span className="font-medium">{tab.label}</span>
+                                  </div>
+                                  {activeDesignTab === tab.id ? (
+                                    <FaChevronUp className="text-gray-500" />
+                                  ) : (
+                                    <FaChevronDown className="text-gray-500" />
                                   )}
                                 </div>
-                              ))}
-                            </div>
-                          </div>
 
-                          <div className="p-6 md:w-1/2 bg-gray-50">
-                            <QRPreviewSection />
-                            <ScanReminderSection />
+                                {activeDesignTab === tab.id && (
+                                  <div className="p-4 bg-white animate-fadeIn">
+                                    {tab.id === 'logo' && <LogoUploadSection />}
+                                    {tab.id === 'pattern' && <PatternSelectionSection />}
+                                    {tab.id === 'eyes' && <EyeStyleSection />}
+                                    {tab.id === 'color' && <ColorSelectionSection />}
+                                    {tab.id === 'frame' && <FrameSelectionSection />}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
                           </div>
+                        </div>
+
+                        <div className="p-6 md:w-1/2 bg-gray-50">
+                          <QRPreviewSection />
+                          <ScanReminderSection />
                         </div>
                       </div>
                     </div>
-                  ) : (
-                    <>
-                      <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
-                        <div className="flex gap-4">
-                          <button
-                            className="bg-primary text-white px-4 py-3 rounded-sm flex items-center hover:bg-teal-700 transition-colors duration-200"
-                            onClick={() => {
-                              setFormData({ name: "", id: null });
-                              setShowTableForm(true);
-                            }}
-                          >
-                            + Add New
-                          </button>
-                          <button
-                            className="border border-gray-300 dark:border-gray-600 px-4 py-3 rounded-sm flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-                            onClick={() => setShowQRCustomization(true)}
-                          >
-                            <img
-                              src="https://www.app.menutigr.com/static/media/qr.d9e8c248e7e8438effce3b671c66f607.svg"
-                              alt="QR Icon"
-                              className="w-4 h-4 mr-2"
-                            />
-                            Customize QR Code
-                          </button>
-                        </div>
-                      </div>
-
-                      {savedSchedulers.length > 0 ? (
-                        <div className="space-y-4">
-                          {savedSchedulers.map((item) => (
-                            <div
-                              key={item.id}
-                              className="p-4 border border-gray-200 dark:border-gray-700 rounded-md flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                            >
-                              <span className="font-medium">{item.name}</span>
-                              <div className="flex space-x-2">
-                                <button
-                                  className="text-gray-500 hover:text-primary"
-                                  onClick={() => handleEdit(item.id)}
-                                >
-                                  <img
-                                    src="https://www.app.menutigr.com/static/media/edit.15f245273e71fb843eeb7281dec04a52.svg"
-                                    alt="Edit"
-                                    className="h-4 w-4"
-                                  />
-                                </button>
-                                <button
-                                  className="text-gray-500 hover:text-red-500"
-                                  onClick={() => handleDelete(item.id)}
-                                >
-                                  <img
-                                    src="https://www.app.menutigr.com/static/media/delete.f9fb3a4cc8c70107a50718ec2199a285.svg"
-                                    alt="Delete"
-                                    className="h-4 w-4"
-                                  />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-gray-500 dark:text-gray-400 flex flex-col items-center justify-center h-64">
-                          <img
-                            src="https://www.app.menutigr.com/static/media/emptyIcon.e5d5b5150b5e6208ac7a2f4dfbdf36a1.svg"
-                            alt="Empty state"
-                            className="w-16 h-16 mb-4"
-                          />
-                          <p>No schedulers added yet</p>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              )}
-              {activeTab === "users" && (
-                <div>
-                  {showUserForm ? (
-                    <div>
-                      {/* Form Header */}
-                      <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center space-x-3">
-                          <button
-                            className="bg-secondary text-white p-2 rounded-sm hover:bg-primary cursor-pointer transition flex items-center justify-center w-10 h-10"
-                            onClick={() => setShowUserForm(false)}
-                          >
-                            <FaChevronLeft />
-                          </button>
-                          <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md select-none">
-                            <span>Users</span> <span className="text-gray-400">/</span>{" "}
-                            <span className="text-primary">Add New User</span>
-                          </div>
-                        </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
+                      <div className="flex gap-4">
                         <button
-                          className="bg-secondary text-white px-4 py-2 rounded-sm hover:bg-primary transition cursor-pointer"
-                          onClick={handleSaveUser}
-                        >
-                          Save
-                        </button>
-                      </div>
-
-                      {/* User Form with parallel labels and inputs */}
-                      <div className="space-y-4 max-w-lg">
-                        {/* First Name */}
-                        <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
-                          <label className="w-1/4 px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
-                            First Name <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            name="firstName"
-                            value={userFormData.firstName}
-                            onChange={handleUserInputChange}
-                            className="flex-1 px-4 py-3 bg-white dark:bg-gray-800 focus:outline-none"
-                            placeholder="Enter first name"
-                            required
-                          />
-                        </div>
-
-                        {/* Last Name */}
-                        <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
-                          <label className="w-1/4 px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
-                            Last Name <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            name="lastName"
-                            value={userFormData.lastName}
-                            onChange={handleUserInputChange}
-                            className="flex-1 px-4 py-3 bg-white dark:bg-gray-800 focus:outline-none"
-                            placeholder="Enter last name"
-                            required
-                          />
-                        </div>
-
-                        {/* Email */}
-                        <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
-                          <label className="w-1/4 px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
-                            Email <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="email"
-                            name="email"
-                            value={userFormData.email}
-                            onChange={handleUserInputChange}
-                            className="flex-1 px-4 py-3 bg-white dark:bg-gray-800 focus:outline-none"
-                            placeholder="Enter email"
-                            required
-                          />
-                        </div>
-
-                        {/* Password */}
-                        <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
-                          <label className="w-1/4 px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
-                            Password <span className="text-red-500">*</span>
-                          </label>
-                          <div className="relative flex-1">
-                            <input
-                              type={showPassword ? "text" : "password"}
-                              name="password"
-                              value={userFormData.password}
-                              onChange={handleUserInputChange}
-                              className="w-full px-4 py-3 bg-white dark:bg-gray-800 focus:outline-none"
-                              placeholder="Enter password"
-                              required
-                            />
-                            <button
-                              type="button"
-                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <FaEyeSlash /> : <FaEye />}
-                            </button>
-                          </div>
-                        </div>
-
-
-                        {/* Confirm Password */}
-                        <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
-                          <label className="w-1/4 px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
-                            Confirm Password <span className="text-red-500">*</span>
-                          </label>
-                          <div className="relative flex-1">
-                            <input
-                              type={showConfirmPassword ? "text" : "password"}
-                              name="confirmPassword"
-                              value={userFormData.confirmPassword}
-                              onChange={handleUserInputChange}
-                              className="w-full px-4 py-3 bg-white dark:bg-gray-800 focus:outline-none"
-                              placeholder="Confirm password"
-                              required
-                            />
-                            <button
-                              type="button"
-                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            >
-                              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Access Level */}
-                        <div className="flex flex-col">
-                          <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
-                            <label className="w-1/4 px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
-                              Access Level <span className="text-red-500">*</span>
-                            </label>
-                            <div className="relative flex-1">
-                              <select
-                                name="accessLevel"
-                                value={userFormData.accessLevel}
-                                onChange={handleUserInputChange}
-                                className="w-full px-4 py-3 bg-white dark:bg-gray-800 focus:outline-none appearance-none"
-                                required
-                              >
-                                <option value="">Select access level</option>
-                                <option value="Admin">Admin</option>
-                                <option value="Manager">Manager</option>
-                                <option value="Staff">Staff</option>
-                                <option value="OrderManager">Order Manager</option>
-                              </select>
-                              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <FaChevronDown className="text-gray-400" />
-                              </div>
-                            </div>
-                          </div>
-                          {userFormData.accessLevel === 'OrderManager' && (
-                            <p className="text-xs text-gray-500 mt-1 ml-[25%] pl-4">
-                              User can view and manage the orders section only
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-sm text-sm text-gray-700 dark:text-gray-300">
-                          <FaQuestionCircle className="text-primary" />
-                          <span>User can view and manage the orders section only</span>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      {/* Table View */}
-                      <div className="flex items-center gap-4 mb-6">
-                        <button
-                          className="bg-secondary text-white px-4 py-3 rounded-sm hover:bg-primary transition-colors duration-200"
+                          className="bg-primary text-white px-4 py-3 rounded-sm flex items-center hover:bg-teal-700 transition-colors duration-200"
                           onClick={() => {
-                            setUserFormData({
-                              firstName: '',
-                              lastName: '',
-                              email: '',
-                              password: '',
-                              confirmPassword: '',
-                              accessLevel: ''
-                            });
-                            setShowUserForm(true);
+                            setFormData({ name: "", id: null });
+                            setShowTableForm(true);
                           }}
                         >
                           + Add New
                         </button>
+                        <button
+                          className="border border-gray-300 dark:border-gray-600 px-4 py-3 rounded-sm flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                          onClick={() => setShowQRCustomization(true)}
+                        >
+                          <img
+                            src="https://www.app.menutigr.com/static/media/qr.d9e8c248e7e8438effce3b671c66f607.svg"
+                            alt="QR Icon"
+                            className="w-4 h-4 mr-2"
+                          />
+                          Customize QR Code
+                        </button>
+                      </div>
+                    </div>
 
-                        <div className="flex items-center gap-2 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-sm text-sm text-gray-700 dark:text-gray-300">
-                          <FaQuestionCircle className="text-primary" />
-                          <span>Manage your store users</span>
+                    {savedSchedulers.length > 0 ? (
+                      <div className="space-y-4">
+                        {savedSchedulers.map((item) => (
+                          <div
+                            key={item.id}
+                            className="p-4 border border-gray-200 dark:border-gray-700 rounded-md flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                          >
+                            <span className="font-medium">{item.name}</span>
+                            <div className="flex space-x-2">
+                              <button
+                                className="text-gray-500 hover:text-primary"
+                                onClick={() => handleEdit(item.id)}
+                              >
+                                <img
+                                  src="https://www.app.menutigr.com/static/media/edit.15f245273e71fb843eeb7281dec04a52.svg"
+                                  alt="Edit"
+                                  className="h-4 w-4"
+                                />
+                              </button>
+                              <button
+                                className="text-gray-500 hover:text-red-500"
+                                onClick={() => handleDelete(item.id)}
+                              >
+                                <img
+                                  src="https://www.app.menutigr.com/static/media/delete.f9fb3a4cc8c70107a50718ec2199a285.svg"
+                                  alt="Delete"
+                                  className="h-4 w-4"
+                                />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-gray-500 dark:text-gray-400 flex flex-col items-center justify-center h-64">
+                        <img
+                          src="https://www.app.menutigr.com/static/media/emptyIcon.e5d5b5150b5e6208ac7a2f4dfbdf36a1.svg"
+                          alt="Empty state"
+                          className="w-16 h-16 mb-4"
+                        />
+                        <p>No schedulers added yet</p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+            {currentPage === 'users' && (
+              <div>
+                {showUserForm ? (
+                  <div>
+                    {/* Form Header */}
+                    <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center space-x-3">
+                        <button
+                          className="bg-secondary text-white p-2 rounded-sm hover:bg-primary cursor-pointer transition flex items-center justify-center w-10 h-10"
+                          onClick={() => setShowUserForm(false)}
+                        >
+                          <FaChevronLeft />
+                        </button>
+                        <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md select-none">
+                          <span>Users</span> <span className="text-gray-400">/</span>{" "}
+                          <span className="text-primary">Add New User</span>
+                        </div>
+                      </div>
+                      <button
+                        className="bg-secondary text-white px-4 py-2 rounded-sm hover:bg-primary transition cursor-pointer"
+                        onClick={handleSaveUser}
+                      >
+                        Save
+                      </button>
+                    </div>
+
+                    {/* User Form with parallel labels and inputs */}
+                    <div className="space-y-4 max-w-lg">
+                      {/* First Name */}
+                      <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
+                        <label className="w-1/4 px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
+                          First Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={userFormData.firstName}
+                          onChange={handleUserInputChange}
+                          className="flex-1 px-4 py-3 bg-white dark:bg-gray-800 focus:outline-none"
+                          placeholder="Enter first name"
+                          required
+                        />
+                      </div>
+
+                      {/* Last Name */}
+                      <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
+                        <label className="w-1/4 px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
+                          Last Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={userFormData.lastName}
+                          onChange={handleUserInputChange}
+                          className="flex-1 px-4 py-3 bg-white dark:bg-gray-800 focus:outline-none"
+                          placeholder="Enter last name"
+                          required
+                        />
+                      </div>
+
+                      {/* Email */}
+                      <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
+                        <label className="w-1/4 px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
+                          Email <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={userFormData.email}
+                          onChange={handleUserInputChange}
+                          className="flex-1 px-4 py-3 bg-white dark:bg-gray-800 focus:outline-none"
+                          placeholder="Enter email"
+                          required
+                        />
+                      </div>
+
+                      {/* Password */}
+                      <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
+                        <label className="w-1/4 px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
+                          Password <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative flex-1">
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            value={userFormData.password}
+                            onChange={handleUserInputChange}
+                            className="w-full px-4 py-3 bg-white dark:bg-gray-800 focus:outline-none"
+                            placeholder="Enter password"
+                            required
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                          </button>
                         </div>
                       </div>
 
-                      <div className="border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
-                        <table className="min-w-full">
-                          <thead className="border-b border-gray-300 dark:border-gray-600">
-                            <tr>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 tracking-wider group dark:hover:bg-gray-700 transition-colors">
-                                <div className="flex items-center gap-1">
-                                  First Name
-                                  <FaArrowUp className="opacity-0 group-hover:opacity-100 text-xs transition-opacity" />
-                                </div>
-                              </th>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 tracking-wider group  dark:hover:bg-gray-700 transition-colors">
-                                <div className="flex items-center gap-1">
-                                  Last Name
-                                  <FaArrowUp className="opacity-0 group-hover:opacity-100 text-xs transition-opacity" />
-                                </div>
-                              </th>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 tracking-wider group dark:hover:bg-gray-700 transition-colors">
-                                <div className="flex items-center gap-1">
-                                  Email
-                                  <FaArrowUp className="opacity-0 group-hover:opacity-100 text-xs transition-opacity" />
-                                </div>
-                              </th>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 tracking-wider group dark:hover:bg-gray-700 transition-colors">
-                                <div className="flex items-center gap-1">
-                                  Access Level
-                                  <FaArrowUp className="opacity-0 group-hover:opacity-100 text-xs transition-opacity" />
-                                </div>
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {users.length > 0 ? (
-                              users.map((user) => (
-                                <tr key={user.id} className="border-b border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{user.firstName}</td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{user.lastName}</td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{user.email}</td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{user.accessLevel}</td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                    <div className="flex space-x-2">
-                                      <button
-                                        onClick={() => handleEditUser(user.id)}
-                                        className="text-blue-600 hover:text-blue-900"
-                                      >
-                                        <FaEdit />
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeleteUser(user.id)}
-                                        className="text-red-600 hover:text-red-900"
-                                      >
-                                        <FaTrash />
-                                      </button>
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))
-                            ) : (
-                              <tr>
-                                <td colSpan="4" className="px-6 py-12 text-center">
-                                  <div className="flex flex-col items-center justify-center">
-                                    <img
-                                      src="https://www.app.menutigr.com/static/media/emptyIcon.e5d5b5150b5e6208ac7a2f4dfbdf36a1.svg"
-                                      alt="No users"
-                                      className="w-16 h-16 mb-4"
-                                    />
-                                    <p className="text-gray-500 dark:text-gray-400">No users added yet</p>
+                      {/* Confirm Password */}
+                      <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
+                        <label className="w-1/4 px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
+                          Confirm Password <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative flex-1">
+                          <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            name="confirmPassword"
+                            value={userFormData.confirmPassword}
+                            onChange={handleUserInputChange}
+                            className="w-full px-4 py-3 bg-white dark:bg-gray-800 focus:outline-none"
+                            placeholder="Confirm password"
+                            required
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          >
+                            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Access Level */}
+                      <div className="flex flex-col">
+                        <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
+                          <label className="w-1/4 px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-r border-gray-300 dark:border-gray-600">
+                            Access Level <span className="text-red-500">*</span>
+                          </label>
+                          <div className="relative flex-1">
+                            <select
+                              name="accessLevel"
+                              value={userFormData.accessLevel}
+                              onChange={handleUserInputChange}
+                              className="w-full px-4 py-3 bg-white dark:bg-gray-800 focus:outline-none appearance-none"
+                              required
+                            >
+                              <option value="">Select access level</option>
+                              <option value="Admin">Admin</option>
+                              <option value="Manager">Manager</option>
+                              <option value="Staff">Staff</option>
+                              <option value="OrderManager">Order Manager</option>
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                              <FaChevronDown className="text-gray-400" />
+                            </div>
+                          </div>
+                        </div>
+                        {userFormData.accessLevel === 'OrderManager' && (
+                          <p className="text-xs text-gray-500 mt-1 ml-[25%] pl-4">
+                            User can view and manage the orders section only
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-sm text-sm text-gray-700 dark:text-gray-300">
+                        <FaQuestionCircle className="text-primary" />
+                        <span>User can view and manage the orders section only</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    {/* Table View */}
+                    <div className="flex items-center gap-4 mb-6">
+                      <button
+                        className="bg-secondary text-white px-4 py-3 rounded-sm hover:bg-primary transition-colors duration-200"
+                        onClick={() => {
+                          setUserFormData({
+                            firstName: '',
+                            lastName: '',
+                            email: '',
+                            password: '',
+                            confirmPassword: '',
+                            accessLevel: ''
+                          });
+                          setShowUserForm(true);
+                        }}
+                      >
+                        + Add New
+                      </button>
+
+                      <div className="flex items-center gap-2 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-sm text-sm text-gray-700 dark:text-gray-300">
+                        <FaQuestionCircle className="text-primary" />
+                        <span>Manage your store users</span>
+                      </div>
+                    </div>
+
+                    <div className="border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden">
+                      <table className="min-w-full">
+                        <thead className="border-b border-gray-300 dark:border-gray-600">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 tracking-wider group dark:hover:bg-gray-700 transition-colors">
+                              <div className="flex items-center gap-1">
+                                First Name
+                                <FaArrowUp className="opacity-0 group-hover:opacity-100 text-xs transition-opacity" />
+                              </div>
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 tracking-wider group  dark:hover:bg-gray-700 transition-colors">
+                              <div className="flex items-center gap-1">
+                                Last Name
+                                <FaArrowUp className="opacity-0 group-hover:opacity-100 text-xs transition-opacity" />
+                              </div>
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 tracking-wider group dark:hover:bg-gray-700 transition-colors">
+                              <div className="flex items-center gap-1">
+                                Email
+                                <FaArrowUp className="opacity-0 group-hover:opacity-100 text-xs transition-opacity" />
+                              </div>
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 tracking-wider group dark:hover:bg-gray-700 transition-colors">
+                              <div className="flex items-center gap-1">
+                                Access Level
+                                <FaArrowUp className="opacity-0 group-hover:opacity-100 text-xs transition-opacity" />
+                              </div>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {users.length > 0 ? (
+                            users.map((user) => (
+                              <tr key={user.id} className="border-b border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{user.firstName}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{user.lastName}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{user.email}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{user.accessLevel}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                  <div className="flex space-x-2">
+                                    <button
+                                      onClick={() => handleEditUser(user.id)}
+                                      className="text-blue-600 hover:text-blue-900"
+                                    >
+                                      <FaEdit />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteUser(user.id)}
+                                      className="text-red-600 hover:text-red-900"
+                                    >
+                                      <FaTrash />
+                                    </button>
                                   </div>
                                 </td>
                               </tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="4" className="px-6 py-12 text-center">
+                                <div className="flex flex-col items-center justify-center">
+                                  <img
+                                    src="https://www.app.menutigr.com/static/media/emptyIcon.e5d5b5150b5e6208ac7a2f4dfbdf36a1.svg"
+                                    alt="No users"
+                                    className="w-16 h-16 mb-4"
+                                  />
+                                  <p className="text-gray-500 dark:text-gray-400">No users added yet</p>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
                     </div>
-                  )}
-                </div>
-              )}
-              {activeTab === "opening" && (
-                <div>
-                  {/* Header Section */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                      <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md select-none">
-                        <span>Opening Hours</span>
-                      </div>
-                      <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-700 dark:text-gray-300">
-                        <FaQuestionCircle className="text-primary" />
-                        <span>Manage your business hours</span>
-                      </div>
-                    </div>
-                    <button
-                      className="bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer w-full sm:w-auto"
-                      onClick={() => {
-                        // Here you would typically:
-                        // 1. Collect all the opening hours data
-                        // 2. Validate the data
-                        // 3. Send to your backend API
-                        // 4. Handle success/error
-                        console.log('Saving opening hours...');
-                        alert('Opening hours saved successfully!');
-
-                        // Example with actual implementation:
-                        // handleSaveOpeningHours();
-                      }}
-                    >
-                      Save
-                    </button>
                   </div>
+                )}
+              </div>
+            )}
+            {currentPage === 'hours' && (
+              <div>
+                {/* Header Section */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md select-none">
+                      <span>Opening Hours</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-700 dark:text-gray-300">
+                      <FaQuestionCircle className="text-primary" />
+                      <span>Manage your business hours</span>
+                    </div>
+                  </div>
+                  <button
+                    className="bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer w-full sm:w-auto"
+                    onClick={() => {
+                      // Here you would typically:
+                      // 1. Collect all the opening hours data
+                      // 2. Validate the data
+                      // 3. Send to your backend API
+                      // 4. Handle success/error
+                      console.log('Saving opening hours...');
+                      alert('Opening hours saved successfully!');
 
-                  {/* Days of Week */}
-                  <div className="space-y-4">
-                    {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-                      <div key={day} className="border border-gray-200 dark:border-gray-700 rounded-md p-4">
-                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                          {/* Day and Toggle */}
-                          <div className="flex items-center gap-4 w-full md:w-auto">
-                            <div className="flex items-center gap-4 border border-gray-200 px-4 py-2 rounded-md flex-1 md:flex-none">
-                              <span className="w-24 text-md">{day}</span>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  className="sr-only peer"
-                                  defaultChecked
-                                  onChange={(e) => {
-                                    // Handle toggle change
-                                    console.log(`${day} active:`, e.target.checked);
-                                  }}
-                                />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-primary"></div>
-                              </label>
-                            </div>
+                      // Example with actual implementation:
+                      // handleSaveOpeningHours();
+                    }}
+                  >
+                    Save
+                  </button>
+                </div>
+
+                {/* Days of Week */}
+                <div className="space-y-4">
+                  {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+                    <div key={day} className="border border-gray-200 dark:border-gray-700 rounded-md p-4">
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        {/* Day and Toggle */}
+                        <div className="flex items-center gap-4 w-full md:w-auto">
+                          <div className="flex items-center gap-4 border border-gray-200 px-4 py-2 rounded-md flex-1 md:flex-none">
+                            <span className="w-24 text-md">{day}</span>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                className="sr-only peer"
+                                defaultChecked
+                                onChange={(e) => {
+                                  // Handle toggle change
+                                  console.log(`${day} active:`, e.target.checked);
+                                }}
+                              />
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-primary"></div>
+                            </label>
                           </div>
+                        </div>
 
-                          {/* Time Slots */}
-                          <div className="flex items-center gap-4 w-full md:w-auto">
-                            <div className="flex items-center gap-2 flex-1">
-                              <input
-                                type="time"
-                                className="border border-gray-300 dark:border-gray-600 rounded px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 w-full"
-                                defaultValue="09:00"
-                                onChange={(e) => {
-                                  // Handle time change
-                                  console.log(`${day} from:`, e.target.value);
-                                }}
-                              />
-                              <span className="mx-1">-</span>
-                              <input
-                                type="time"
-                                className="border border-gray-300 dark:border-gray-600 rounded px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 w-full"
-                                defaultValue="17:00"
-                                onChange={(e) => {
-                                  // Handle time change
-                                  console.log(`${day} to:`, e.target.value);
-                                }}
-                              />
-                            </div>
-                            <button
-                              className="bg-secondary text-white p-2 rounded-sm hover:bg-secondary-dark transition-colors flex-shrink-0"
-                              onClick={() => {
-                                // Handle adding new time slot
-                                console.log(`Add new time slot for ${day}`);
+                        {/* Time Slots */}
+                        <div className="flex items-center gap-4 w-full md:w-auto">
+                          <div className="flex items-center gap-2 flex-1">
+                            <input
+                              type="time"
+                              className="border border-gray-300 dark:border-gray-600 rounded px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 w-full"
+                              defaultValue="09:00"
+                              onChange={(e) => {
+                                // Handle time change
+                                console.log(`${day} from:`, e.target.value);
                               }}
-                            >
-                              <FaPlus className="w-4 h-4" />
-                            </button>
+                            />
+                            <span className="mx-1">-</span>
+                            <input
+                              type="time"
+                              className="border border-gray-300 dark:border-gray-600 rounded px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 w-full"
+                              defaultValue="17:00"
+                              onChange={(e) => {
+                                // Handle time change
+                                console.log(`${day} to:`, e.target.value);
+                              }}
+                            />
                           </div>
+                          <button
+                            className="bg-secondary text-white p-2 rounded-sm hover:bg-secondary-dark transition-colors flex-shrink-0"
+                            onClick={() => {
+                              // Handle adding new time slot
+                              console.log(`Add new time slot for ${day}`);
+                            }}
+                          >
+                            <FaPlus className="w-4 h-4" />
+                          </button>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {activeTab === "social" && (
-                <div>
-                  {/* Header Section */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-3 mb-4 sm:mb-0">
-                      <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md select-none border border-gray-300 dark:border-gray-600">
-                        <span>Social Accounts</span>
-                      </div>
-                      <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-700 dark:text-gray-300">
-                        <FaQuestionCircle className="text-primary" />
-                        <span>Add your social accounts</span>
                       </div>
                     </div>
-                    <button className="bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer w-full sm:w-auto border border-primary">
-                      Save
-                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {currentPage === 'social' && (
+
+              <div>
+                {/* Header Section */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-3 mb-4 sm:mb-0">
+                    <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md select-none border border-gray-300 dark:border-gray-600">
+                      <span>Social Accounts</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-700 dark:text-gray-300">
+                      <FaQuestionCircle className="text-primary" />
+                      <span>Add your social accounts</span>
+                    </div>
+                  </div>
+                  <button className="bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer w-full sm:w-auto border border-primary">
+                    Save
+                  </button>
+                </div>
+
+                {/* Divider */}
+                <div className="border-b border-gray-200 dark:border-gray-700 mb-6"></div>
+
+                {/* Social Media Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    {
+                      name: "Facebook",
+                      icon: "https://cdn-icons-png.flaticon.com/512/124/124010.png",
+                      placeholder: "https://facebook.com/yourpage"
+                    },
+                    {
+                      name: "Twitter (X)",
+                      icon: "https://cdn-icons-png.flaticon.com/512/124/124021.png",
+                      placeholder: "https://twitter.com/yourhandle"
+                    },
+                    {
+                      name: "Instagram",
+                      icon: "https://cdn-icons-png.flaticon.com/512/174/174855.png",
+                      placeholder: "https://instagram.com/yourprofile"
+                    },
+                    {
+                      name: "LinkedIn",
+                      icon: "https://cdn-icons-png.flaticon.com/512/174/174857.png",
+                      placeholder: "https://linkedin.com/company/yourpage"
+                    },
+                    {
+                      name: "YouTube",
+                      icon: "https://cdn-icons-png.flaticon.com/512/174/174883.png",
+                      placeholder: "https://youtube.com/yourchannel"
+                    },
+                    {
+                      name: "TikTok",
+                      icon: "https://cdn-icons-png.flaticon.com/512/3046/3046126.png",
+                      placeholder: "https://tiktok.com/@yourusername"
+                    }
+                  ].map((social) => (
+                    <div key={social.name} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 flex-shrink-0 bg-white dark:bg-gray-800 rounded-full p-2 border border-gray-200 dark:border-gray-600">
+                          <img src={social.icon} alt={social.name} className="w-full h-full object-contain" />
+                        </div>
+                        <h4 className="font-medium text-lg">{social.name}</h4>
+                      </div>
+                      <input
+                        type="text"
+                        placeholder={social.placeholder}
+                        className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-800 text-sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {currentPage === 'wifi' && <div>WiFi Content</div>}
+            {currentPage === 'location' && (
+              <div>
+                {/* Header Section - unchanged */}
+                <div className="flex flex-col sm:flex-col md:flex-row justify-between gap-4 md:gap-6 items-start md:items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full">
+                    <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-md select-none border border-gray-300 dark:border-gray-600 w-full md:w-auto">
+                      <span>Location Details</span>
+                    </div>
+                    <div className="flex items-start gap-2 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-700 dark:text-gray-300 w-full md:w-auto">
+                      <FaQuestionCircle className="text-primary mt-0.5" />
+                      <span className="leading-snug">
+                        Add store location details to identify customer orders which are inside the store radius area
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    className="bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer w-full md:w-auto border border-primary"
+                    onClick={() => {
+                      // Add your save logic here
+                      console.log('Saving location data:', {
+                        latitude: 14.599512,
+                        longitude: 120.984222,
+                        radius: radiusValue // radiusValue should be from your state
+                      });
+                      alert('Location settings saved!');
+                    }}
+                  >
+                    Save
+                  </button>
+                </div>
+
+                {/* Location Toggle - unchanged */}
+                <div className="flex items-center justify-between px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-md mb-6 max-w-90">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-500">Enable location details</span>
+                    <FaQuestionCircle className="text-primary text-sm" />
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={locationEnabled}
+                      onChange={() => setLocationEnabled(!locationEnabled)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-primary"></div>
+                  </label>
+                </div>
+
+                {/* Location Details Form */}
+                {locationEnabled && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Left Side - Location Details */}
+                    <div className="space-y-4">
+                      <button className="flex items-center justify-center gap-2 text-secondary px-3 py-2 rounded-md hover:bg-secondary-dark/10 dark:hover:bg-secondary-dark/20 transition-all cursor-pointer w-full border border-primary hover:border-primary-dark hover:shadow-sm">
+                        <FaMapMarkerAlt className="text-primary" />
+                        Get Current Location
+                      </button>
+                      <div className="border border-gray-300 dark:border-gray-600 rounded-md p-4 space-y-4">
+                        {/* Latitude and Longitude - unchanged */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center bg-gray-100 px-3 py-2 rounded-md">
+                            <span className="text-sm text-gray-700 dark:text-gray-300">Latitude</span>
+                            <span className="text-gray-900 dark:text-gray-100">14.599512</span>
+                          </div>
+                          <div className="flex justify-between items-center bg-gray-100 px-3 py-2 rounded-md">
+                            <span className="text-sm text-gray-700 dark:text-gray-300">Longitude</span>
+                            <span className="text-gray-900 dark:text-gray-100">120.984222</span>
+                          </div>
+                        </div>
+
+                        {/* Radius - now connected to state */}
+                        <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
+                          <div className="flex items-center">
+                            <span className="text-sm text-gray-700 dark:text-gray-300 px-3 py-2 border-r border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
+                              Radius *
+                            </span>
+                            <input
+                              type="number"
+                              className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none"
+                              value={radiusValue}
+                              onChange={(e) => setRadiusValue(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-md text-md text-gray-700 dark:text-gray-300">
+                          <FaQuestionCircle className="text-primary" />
+                          <span>Radius in meter (1 Meter = 3.28 Feet)</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Side - Map now shows radius */}
+                    <div>
+                      <div className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-700 dark:text-gray-300 mb-4">
+                        <FaQuestionCircle className="text-primary" />
+                        <span>Use the interactive map to set your location</span>
+                      </div>
+                      <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-300 dark:border-gray-600 flex items-center justify-center relative">
+                        {/* Simple visualization of radius - would be replaced with actual map in production */}
+                        <div
+                          className="absolute border-2 border-primary rounded-full bg-primary/10"
+                          style={{
+                            width: `${Math.min(radiusValue * 2, 300)}px`,
+                            height: `${Math.min(radiusValue * 2, 300)}px`,
+                            transition: 'all 0.3s ease'
+                          }}
+                        ></div>
+                        <span className="text-gray-500 dark:text-gray-400 z-10">Map with {radiusValue}m radius</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            {currentPage === 'settings' && (
+              <div>
+                {/* Settings Header Section */}
+                <div className="flex flex-col sm:flex-col md:flex-row justify-between gap-4 md:gap-6 items-start md:items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full">
+                    <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-3 py-3 rounded-sm select-none w-full md:w-auto">
+                      <span>Settings</span>
+                    </div>
+                    <div className="flex items-start gap-2 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-sm text-sm text-gray-700 dark:text-gray-300 w-full md:w-auto">
+                      <FaQuestionCircle className="text-primary mt-0.5" />
+                      <span className="leading-snug">
+                        Manage your store settings
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    className="bg-secondary text-white px-4 py-3 rounded-sm hover:bg-primary transition cursor-pointer w-full md:w-auto border border-primary"
+                    onClick={() => {
+                      // Prepare settings data to save
+                      const settingsData = {
+                        contactlessMenu: {
+                          takeawayEnabled: takeawayEnabled,
+                          dineInEnabled: dineInEnabled
+                        },
+                        foodAppearance: {
+                          allowSpecialInstructions: allowSpecialInstructions,
+                          displayFullFoodName: displayFullFoodName
+                        },
+                        storeMenu: storeMenu
+                      };
+
+                      // Here you would typically make an API call
+                      console.log('Saving settings:', settingsData);
+
+                      // Show success feedback
+                      alert('Settings saved successfully!');
+
+                      // You could also add state management here
+                      // setSavedSettings(settingsData);
+                    }}
+                  >
+                    Save
+                  </button>
+                </div>
+
+                {/* Settings Content */}
+                <div className="space-y-6">
+                  {/* First Border Section */}
+                  <div className="border border-gray-200 dark:border-gray-700 rounded-sm p-4">
+                    <div className="flex items-center justify-between mb-4 border border-primary px-4 py-3 rounded-sm">
+                      <div className="flex items-center gap-2">
+                        <FaQuestionCircle className="text-primary text-sm" />
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                          How to make a contactless view-only menu with no order and pay option?
+                        </h4>
+                      </div>
+                      <a href="#" className="text-sm text-primary hover:underline">Read more</a>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Enable Takeaway */}
+                      <div className="flex items-center justify-between border border-gray-300 px-4 py-3 rounded-sm">
+                        <div className="flex items-center gap-2">
+                          <span>Enable takeaway</span>
+                          <FaQuestionCircle className="text-primary text-sm" />
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={takeawayEnabled}
+                            onChange={() => setTakeawayEnabled(!takeawayEnabled)}
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-primary"></div>
+                        </label>
+                      </div>
+
+                      {/* Enable Dine In */}
+                      <div className="flex items-center justify-between border border-gray-300 px-4 py-3 rounded-sm">
+                        <div className="flex items-center gap-2">
+                          <span>Enable dine in</span>
+                          <FaQuestionCircle className="text-primary text-sm" />
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={dineInEnabled}
+                            onChange={() => setDineInEnabled(!dineInEnabled)}
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-primary"></div>
+                        </label>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Divider */}
-                  <div className="border-b border-gray-200 dark:border-gray-700 mb-6"></div>
+                  {/* Second Border Section */}
+                  <div className="border border-gray-200 dark:border-gray-700 rounded-sm p-4">
+                    <div className="flex items-center gap-2 mb-4 border border-primary px-4 py-3 rounded-sm">
+                      <FaQuestionCircle className="text-primary text-sm" />
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                        Customize your food appearance
+                      </h4>
+                    </div>
 
-                  {/* Social Media Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {[
-                      {
-                        name: "Facebook",
-                        icon: "https://cdn-icons-png.flaticon.com/512/124/124010.png",
-                        placeholder: "https://facebook.com/yourpage"
-                      },
-                      {
-                        name: "Twitter (X)",
-                        icon: "https://cdn-icons-png.flaticon.com/512/124/124021.png",
-                        placeholder: "https://twitter.com/yourhandle"
-                      },
-                      {
-                        name: "Instagram",
-                        icon: "https://cdn-icons-png.flaticon.com/512/174/174855.png",
-                        placeholder: "https://instagram.com/yourprofile"
-                      },
-                      {
-                        name: "LinkedIn",
-                        icon: "https://cdn-icons-png.flaticon.com/512/174/174857.png",
-                        placeholder: "https://linkedin.com/company/yourpage"
-                      },
-                      {
-                        name: "YouTube",
-                        icon: "https://cdn-icons-png.flaticon.com/512/174/174883.png",
-                        placeholder: "https://youtube.com/yourchannel"
-                      },
-                      {
-                        name: "TikTok",
-                        icon: "https://cdn-icons-png.flaticon.com/512/3046/3046126.png",
-                        placeholder: "https://tiktok.com/@yourusername"
-                      }
-                    ].map((social) => (
-                      <div key={social.name} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="w-10 h-10 flex-shrink-0 bg-white dark:bg-gray-800 rounded-full p-2 border border-gray-200 dark:border-gray-600">
-                            <img src={social.icon} alt={social.name} className="w-full h-full object-contain" />
-                          </div>
-                          <h4 className="font-medium text-lg">{social.name}</h4>
+                    <div className="space-y-4">
+                      {/* Allow Special Instructions */}
+                      <div className="flex items-center justify-between border border-gray-300 px-4 py-3 rounded-sm">
+                        <div className="flex items-center gap-2">
+                          <span>Allow special instructions</span>
+                          <FaQuestionCircle className="text-primary text-sm" />
                         </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={allowSpecialInstructions}
+                            onChange={() => setAllowSpecialInstructions(!allowSpecialInstructions)}
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-primary"></div>
+                        </label>
+                      </div>
+
+                      {/* Display Full Food Name */}
+                      <div className="flex items-center justify-between border border-gray-300 px-4 py-3 rounded-sm">
+                        <div className="flex items-center gap-2">
+                          <span>Display full food name</span>
+                          <FaQuestionCircle className="text-primary text-sm" />
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={displayFullFoodName}
+                            onChange={() => setDisplayFullFoodName(!displayFullFoodName)}
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-primary"></div>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Third Border Section */}
+                  <div className="border border-gray-200 dark:border-gray-700 rounded-sm p-4">
+                    <div className="flex items-center gap-2 mb-4 border border-gray-300 px-4 py-3 rounded-sm">
+                      <FaQuestionCircle className="text-primary text-sm" />
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                        Select a restaurant menu for your store
+                      </h4>
+                    </div>
+
+                    <div className="border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden focus-within:border-primary transition-colors">
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-700 dark:text-gray-300 px-3 py-2 border-r border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
+                          Store Menu *
+                        </span>
                         <input
                           type="text"
-                          placeholder={social.placeholder}
-                          className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-800 text-sm"
+                          className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none"
+                          placeholder="Select menu"
+                          value={storeMenu}
+                          onChange={(e) => setStoreMenu(e.target.value)}
                         />
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {activeTab === "wifi" && (
-                <div>
-                  <h3 className="text-xl font-bold mb-4">WiFi Settings</h3>
-                  <p>WiFi configuration for {selectedStore.name}</p>
-                </div>
-              )}
-              {activeTab === "location" && (
-                <div>
-                  {/* Header Section - unchanged */}
-                  <div className="flex flex-col sm:flex-col md:flex-row justify-between gap-4 md:gap-6 items-start md:items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full">
-                      <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-md select-none border border-gray-300 dark:border-gray-600 w-full md:w-auto">
-                        <span>Location Details</span>
-                      </div>
-                      <div className="flex items-start gap-2 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-700 dark:text-gray-300 w-full md:w-auto">
-                        <FaQuestionCircle className="text-primary mt-0.5" />
-                        <span className="leading-snug">
-                          Add store location details to identify customer orders which are inside the store radius area
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      className="bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer w-full md:w-auto border border-primary"
-                      onClick={() => {
-                        // Add your save logic here
-                        console.log('Saving location data:', {
-                          latitude: 14.599512,
-                          longitude: 120.984222,
-                          radius: radiusValue // radiusValue should be from your state
-                        });
-                        alert('Location settings saved!');
-                      }}
-                    >
-                      Save
-                    </button>
-                  </div>
-
-                  {/* Location Toggle - unchanged */}
-                  <div className="flex items-center justify-between px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-md mb-6 max-w-90">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">Enable location details</span>
-                      <FaQuestionCircle className="text-primary text-sm" />
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        checked={locationEnabled}
-                        onChange={() => setLocationEnabled(!locationEnabled)}
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-primary"></div>
-                    </label>
-                  </div>
-
-                  {/* Location Details Form */}
-                  {locationEnabled && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {/* Left Side - Location Details */}
-                      <div className="space-y-4">
-                        <button className="flex items-center justify-center gap-2 text-secondary px-3 py-2 rounded-md hover:bg-secondary-dark/10 dark:hover:bg-secondary-dark/20 transition-all cursor-pointer w-full border border-primary hover:border-primary-dark hover:shadow-sm">
-                          <FaMapMarkerAlt className="text-primary" />
-                          Get Current Location
-                        </button>
-                        <div className="border border-gray-300 dark:border-gray-600 rounded-md p-4 space-y-4">
-                          {/* Latitude and Longitude - unchanged */}
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center bg-gray-100 px-3 py-2 rounded-md">
-                              <span className="text-sm text-gray-700 dark:text-gray-300">Latitude</span>
-                              <span className="text-gray-900 dark:text-gray-100">14.599512</span>
-                            </div>
-                            <div className="flex justify-between items-center bg-gray-100 px-3 py-2 rounded-md">
-                              <span className="text-sm text-gray-700 dark:text-gray-300">Longitude</span>
-                              <span className="text-gray-900 dark:text-gray-100">120.984222</span>
-                            </div>
-                          </div>
-
-                          {/* Radius - now connected to state */}
-                          <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
-                            <div className="flex items-center">
-                              <span className="text-sm text-gray-700 dark:text-gray-300 px-3 py-2 border-r border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
-                                Radius *
-                              </span>
-                              <input
-                                type="number"
-                                className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none"
-                                value={radiusValue}
-                                onChange={(e) => setRadiusValue(e.target.value)}
-                              />
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-md text-md text-gray-700 dark:text-gray-300">
-                            <FaQuestionCircle className="text-primary" />
-                            <span>Radius in meter (1 Meter = 3.28 Feet)</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Right Side - Map now shows radius */}
-                      <div>
-                        <div className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-700 dark:text-gray-300 mb-4">
-                          <FaQuestionCircle className="text-primary" />
-                          <span>Use the interactive map to set your location</span>
-                        </div>
-                        <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-300 dark:border-gray-600 flex items-center justify-center relative">
-                          {/* Simple visualization of radius - would be replaced with actual map in production */}
-                          <div
-                            className="absolute border-2 border-primary rounded-full bg-primary/10"
-                            style={{
-                              width: `${Math.min(radiusValue * 2, 300)}px`,
-                              height: `${Math.min(radiusValue * 2, 300)}px`,
-                              transition: 'all 0.3s ease'
-                            }}
-                          ></div>
-                          <span className="text-gray-500 dark:text-gray-400 z-10">Map with {radiusValue}m radius</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-              {activeTab === "settings" && (
-                <div>
-                  {/* Settings Header Section */}
-                  <div className="flex flex-col sm:flex-col md:flex-row justify-between gap-4 md:gap-6 items-start md:items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full">
-                      <div className="text-gray-900 dark:text-gray-100 text-md bg-gray-100 dark:bg-gray-700 px-3 py-3 rounded-sm select-none w-full md:w-auto">
-                        <span>Settings</span>
-                      </div>
-                      <div className="flex items-start gap-2 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-sm text-sm text-gray-700 dark:text-gray-300 w-full md:w-auto">
-                        <FaQuestionCircle className="text-primary mt-0.5" />
-                        <span className="leading-snug">
-                          Manage your store settings
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      className="bg-secondary text-white px-4 py-3 rounded-sm hover:bg-primary transition cursor-pointer w-full md:w-auto border border-primary"
-                      onClick={() => {
-                        // Prepare settings data to save
-                        const settingsData = {
-                          contactlessMenu: {
-                            takeawayEnabled: takeawayEnabled,
-                            dineInEnabled: dineInEnabled
-                          },
-                          foodAppearance: {
-                            allowSpecialInstructions: allowSpecialInstructions,
-                            displayFullFoodName: displayFullFoodName
-                          },
-                          storeMenu: storeMenu
-                        };
-
-                        // Here you would typically make an API call
-                        console.log('Saving settings:', settingsData);
-
-                        // Show success feedback
-                        alert('Settings saved successfully!');
-
-                        // You could also add state management here
-                        // setSavedSettings(settingsData);
-                      }}
-                    >
-                      Save
-                    </button>
-                  </div>
-
-                  {/* Settings Content */}
-                  <div className="space-y-6">
-                    {/* First Border Section */}
-                    <div className="border border-gray-200 dark:border-gray-700 rounded-sm p-4">
-                      <div className="flex items-center justify-between mb-4 border border-primary px-4 py-3 rounded-sm">
-                        <div className="flex items-center gap-2">
-                          <FaQuestionCircle className="text-primary text-sm" />
-                          <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                            How to make a contactless view-only menu with no order and pay option?
-                          </h4>
-                        </div>
-                        <a href="#" className="text-sm text-primary hover:underline">Read more</a>
-                      </div>
-
-                      <div className="space-y-4">
-                        {/* Enable Takeaway */}
-                        <div className="flex items-center justify-between border border-gray-300 px-4 py-3 rounded-sm">
-                          <div className="flex items-center gap-2">
-                            <span>Enable takeaway</span>
-                            <FaQuestionCircle className="text-primary text-sm" />
-                          </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              className="sr-only peer"
-                              checked={takeawayEnabled}
-                              onChange={() => setTakeawayEnabled(!takeawayEnabled)}
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-primary"></div>
-                          </label>
-                        </div>
-
-                        {/* Enable Dine In */}
-                        <div className="flex items-center justify-between border border-gray-300 px-4 py-3 rounded-sm">
-                          <div className="flex items-center gap-2">
-                            <span>Enable dine in</span>
-                            <FaQuestionCircle className="text-primary text-sm" />
-                          </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              className="sr-only peer"
-                              checked={dineInEnabled}
-                              onChange={() => setDineInEnabled(!dineInEnabled)}
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-primary"></div>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Second Border Section */}
-                    <div className="border border-gray-200 dark:border-gray-700 rounded-sm p-4">
-                      <div className="flex items-center gap-2 mb-4 border border-primary px-4 py-3 rounded-sm">
-                        <FaQuestionCircle className="text-primary text-sm" />
-                        <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                          Customize your food appearance
-                        </h4>
-                      </div>
-
-                      <div className="space-y-4">
-                        {/* Allow Special Instructions */}
-                        <div className="flex items-center justify-between border border-gray-300 px-4 py-3 rounded-sm">
-                          <div className="flex items-center gap-2">
-                            <span>Allow special instructions</span>
-                            <FaQuestionCircle className="text-primary text-sm" />
-                          </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              className="sr-only peer"
-                              checked={allowSpecialInstructions}
-                              onChange={() => setAllowSpecialInstructions(!allowSpecialInstructions)}
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-primary"></div>
-                          </label>
-                        </div>
-
-                        {/* Display Full Food Name */}
-                        <div className="flex items-center justify-between border border-gray-300 px-4 py-3 rounded-sm">
-                          <div className="flex items-center gap-2">
-                            <span>Display full food name</span>
-                            <FaQuestionCircle className="text-primary text-sm" />
-                          </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              className="sr-only peer"
-                              checked={displayFullFoodName}
-                              onChange={() => setDisplayFullFoodName(!displayFullFoodName)}
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-primary"></div>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Third Border Section */}
-                    <div className="border border-gray-200 dark:border-gray-700 rounded-sm p-4">
-                      <div className="flex items-center gap-2 mb-4 border border-gray-300 px-4 py-3 rounded-sm">
-                        <FaQuestionCircle className="text-primary text-sm" />
-                        <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                          Select a restaurant menu for your store
-                        </h4>
-                      </div>
-
-                      <div className="border border-gray-300 dark:border-gray-600 rounded-sm overflow-hidden focus-within:border-primary transition-colors">
-                        <div className="flex items-center">
-                          <span className="text-sm text-gray-700 dark:text-gray-300 px-3 py-2 border-r border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
-                            Store Menu *
-                          </span>
-                          <input
-                            type="text"
-                            className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 outline-none"
-                            placeholder="Select menu"
-                            value={storeMenu}
-                            onChange={(e) => setStoreMenu(e.target.value)}
-                          />
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

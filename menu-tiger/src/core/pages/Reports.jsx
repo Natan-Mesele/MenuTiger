@@ -383,8 +383,8 @@ function Reports() {
               />
             </div>
 
-            <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
-              <table className="min-w-full text-left text-sm">
+            <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead>
                   <tr className="text-gray-700 dark:text-gray-200 border-b border-gray-300 dark:border-gray-600">
                     {["Email", "First Name", "Last Name", "Contact Number", "Date", "Image"].map((header) => (
