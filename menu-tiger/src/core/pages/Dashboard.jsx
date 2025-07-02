@@ -133,8 +133,8 @@ const Dashboard = () => {
               key={period}
               onClick={() => handlePeriodClick(period)}
               className={`flex-1 min-w-[100px] py-4 px-6 rounded-md cursor-pointer font-semibold transition whitespace-nowrap ${selectedPeriod === period
-                  ? "bg-primary text-white"
-                  : "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-teal-500 hover:text-white"
+                ? "bg-primary text-white"
+                : "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-teal-500 hover:text-white"
                 }`}
             >
               {period}
@@ -177,22 +177,24 @@ const Dashboard = () => {
           <div className="relative flex-1 min-w-[180px]">
             <button
               onClick={() => handlePeriodClick("All")}
-              className={`w-full py-4 px-6 rounded-md cursor-pointer font-semibold flex items-center justify-center transition whitespace-nowrap ${allDropdownOpen
-                  ? "bg-primary text-white"
-                  : "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+              className={`w-full py-4 px-6 rounded-md cursor-pointer font-semibold flex items-center justify-between transition whitespace-nowrap ${allDropdownOpen
+                ? "border border-primary text-gray-700 bg-white"
+                : "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-primary"
                 }`}
             >
-              <img
-                src="https://www.app.menutigr.com/static/media/store.e0808a2a2a59e39e07e4c4eb3c95ad92.svg"
-                alt="Store"
-                className="w-5 h-5 mr-2"
-              />
-              All
-              <FaChevronDown className="ml-2 text-gray-500" />
+              <span className="flex items-center">
+                <img
+                  src="https://www.app.menutigr.com/static/media/store.e0808a2a2a59e39e07e4c4eb3c95ad92.svg"
+                  alt="Store"
+                  className="w-5 h-5 mr-2"
+                />
+                All
+              </span>
+              <FaChevronDown className="text-gray-500" />
             </button>
 
             {allDropdownOpen && (
-              <div className="absolute top-full right-0 mt-1 w-full bg-white dark:bg-gray-800 rounded-md shadow-lg z-10">
+              <div className="absolute top-full cursor-pointer right-0 mt-1 w-full bg-white dark:bg-gray-800 rounded-md shadow-lg z-10">
                 <div className="py-1">
                   {["All Locations", "All Time", "All Categories"].map((item) => (
                     <div
@@ -206,6 +208,7 @@ const Dashboard = () => {
               </div>
             )}
           </div>
+
         </div>
       </div>
 
@@ -300,7 +303,7 @@ const Dashboard = () => {
                 </button>
 
                 {isDropdownOpen && (
-                  <ul className="absolute top-full mt-1 left-0 w-full bg-white rounded-md shadow-md z-20">
+                 <ul className="absolute top-full left-0 mt-1 w-full bg-white rounded-md shadow-md z-20">
                     {chartOptions.map((option) => (
                       <li
                         key={option}

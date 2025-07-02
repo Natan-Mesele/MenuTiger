@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   FaRocket,
   FaUtensils,
@@ -9,6 +9,8 @@ import {
   FaChevronLeft,
   FaLanguage,
   FaArrowUp,
+  FaChevronDown,
+  FaCar,
 } from "react-icons/fa";
 
 function HotActions() {
@@ -16,6 +18,14 @@ function HotActions() {
   const [editSection, setEditSection] = useState("hot-actions");
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [selectedRange, setSelectedRange] = useState("Today");
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState("All");
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [paymentDropdownOpen, setPaymentDropdownOpen] = useState(false);
+
+  const storeRef = useRef(null);
+  const paymentRef = useRef(null);
+  const statusRef = useRef(null);
 
   const actionImages = [
     {
@@ -154,7 +164,7 @@ function HotActions() {
       {/* Tabs Navigation */}
       <div className="flex border-b border-gray-200 dark:border-gray-700 mb-0 bg-[#fafcff] rounded-md">
         <button
-          className={`flex items-center px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200 ${activeTab === "create"
+          className={`flex items-center cursor-pointer px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200 ${activeTab === "create"
             ? "text-primary border-primary"
             : "text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-300"
             }`}
@@ -168,7 +178,7 @@ function HotActions() {
           Create Hot Actions
         </button>
         <button
-          className={`flex items-center px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200 ${activeTab === "requests"
+          className={`flex items-center cursor-pointer px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200 ${activeTab === "requests"
             ? "text-primary border-primary"
             : "text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-300"
             }`}
@@ -186,7 +196,7 @@ function HotActions() {
             {/* Top Controls */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-grow">
-                <button className="flex items-center bg-primary text-white px-4 py-3 rounded-md hover:bg-teal-700 transition duration-200 text-sm">
+                <button className="flex items-center cursor-pointer bg-primary text-white px-4 py-3 rounded-md hover:bg-teal-700 transition duration-200 text-sm">
                   <FaPlus className="mr-2" />
                   Add New
                   <FaLock className="ml-2 text-sm" />
@@ -287,7 +297,7 @@ function HotActions() {
                           }`}
                       >
                         <div
-                          className={`bg-secondary w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${action.isAvailable ? "translate-x-6" : "translate-x-0"
+                          className={`bg-secondary cursor-pointer w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${action.isAvailable ? "translate-x-6" : "translate-x-0"
                             }`}
                         />
                       </button>
@@ -295,7 +305,7 @@ function HotActions() {
                       {/* Update Icon */}
                       <button
                         title="Update"
-                        className="hover:opacity-80 transition-opacity"
+                        className="hover:opacity-80 transition-opacity cursor-pointer"
                         onClick={() => handleUpdate(action.id)}
                       >
                         <img
@@ -309,7 +319,7 @@ function HotActions() {
                       <button
                         title="Delete"
                         onClick={() => handleDelete(action.id)}
-                        className="hover:opacity-80 transition-opacity"
+                        className="hover:opacity-80 transition-opacity cursor-pointer"
                       >
                         <img
                           src="https://www.app.menutigr.com/static/media/delete.f9fb3a4cc8c70107a50718ec2199a285.svg"
@@ -344,7 +354,7 @@ function HotActions() {
                 </div>
               </div>
               <button
-                className="bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer"
+                className="bg-primary cursor-pointer text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer"
                 onClick={handleSaveEdit}
               >
                 Save
@@ -354,7 +364,7 @@ function HotActions() {
             {/* Edit section tabs */}
             <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
               <button
-                className={`flex items-center px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200 ${editSection === "hot-actions"
+                className={`flex items-center cursor-pointer px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200 ${editSection === "hot-actions"
                   ? "text-primary border-primary"
                   : "text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-300"
                   }`}
@@ -368,7 +378,7 @@ function HotActions() {
                 Hot Action
               </button>
               <button
-                className={`flex items-center px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200 ${editSection === "localize"
+                className={`flex items-center cursor-pointer px-4 py-2 text-sm font-medium border-b-2 transition-all duration-200 ${editSection === "localize"
                   ? "text-primary border-primary"
                   : "text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-300"
                   }`}
@@ -484,17 +494,17 @@ function HotActions() {
         )}
         {activeTab === "requests" && (
           <div className="space-y-4">
-            {/* Filter Controls (above the table) */}
-            <div className="flex flex-wrap w-full gap-4 mb-4">
-              {/* Date Range Buttons - full width on small screens, fit content on larger */}
-              <div className="flex flex-1 gap-2">
+            {/* Filter Controls */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              {/* Date Range Buttons */}
+              <div className="flex flex-wrap gap-2 flex-1 min-w-0">
                 {["Today", "Week", "Month"].map((label) => (
                   <button
                     key={label}
                     onClick={() => setSelectedRange(label)}
-                    className={`flex-1 px-6 py-3 rounded-md text-sm transition-colors duration-200 text-center ${selectedRange === label
-                      ? "bg-primary text-white"
-                      : "bg-white dark:bg-gray-700 text-primary dark:text-gray-200 border border-primary"
+                    className={`flex-1 min-w-[100px] sm:min-w-[120px] px-3 cursor-pointer sm:px-4 py-2 rounded-md text-sm transition-colors duration-200 text-center ${selectedRange === label
+                        ? "bg-primary text-white"
+                        : "bg-white dark:bg-gray-700 text-primary dark:text-gray-200 border border-primary"
                       }`}
                   >
                     {label}
@@ -502,65 +512,91 @@ function HotActions() {
                 ))}
               </div>
 
-              {/* Right Side: Dropdowns and Filter Button */}
-              <div className="flex flex-1 gap-2">
-                {/* First Dropdown */}
-                <div className="relative flex-1">
-                  <select className="appearance-none w-full pl-8 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-sm">
-                    <option>🏬  All</option>
-                    <option>🏠 Menu tiger</option>
-                  </select>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-300"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+              {/* Dropdowns Container */}
+              <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
+                {/* Payment Dropdown */}
+                <div className="relative flex-1 min-w-[150px] sm:w-48" ref={paymentRef}>
+                  <div
+                    onClick={() => setPaymentDropdownOpen(!paymentDropdownOpen)}
+                    className="pl-8 pr-3 py-2 sm:py-2.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-sm flex justify-between items-center text-gray-800 dark:text-gray-100 cursor-pointer"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                    <span className="truncate">{selectedPayment}</span>
+                    <FaChevronDown className="ml-2 text-gray-400 text-xs" />
+                  </div>
+                  <span className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-primary text-green-100 px-1.5 py-0.5 rounded text-xs font-medium pointer-events-none">
+                    $
+                  </span>
+                  {paymentDropdownOpen && (
+                    <div className="absolute mt-1 w-full bg-white dark:bg-gray-800 rounded-md shadow-lg z-30 border border-gray-200 dark:border-gray-700">
+                      {["All", "Paid", "Not Paid"].map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => {
+                            setSelectedPayment(option);
+                            setPaymentDropdownOpen(false);
+                          }}
+                          className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 truncate"
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                {/* Second Dropdown */}
-                <div className="relative flex-1">
-                  <select className="appearance-none w-full pl-8 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-sm">
-                    <option>🌍  All</option>
-                    <option>Active</option>
-                    <option>Approved</option>
-                  </select>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-300"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                {/* Status Dropdown */}
+                <div className="relative flex-1 min-w-[150px] sm:w-48" ref={statusRef}>
+                  <div
+                    onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+                    className="pl-8 pr-3 py-2 sm:py-2.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-sm flex justify-between items-center text-gray-800 dark:text-gray-100 cursor-pointer"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                    <span className="truncate">{selectedStatus}</span>
+                    <FaChevronDown className="ml-2 text-gray-400 text-xs" />
+                  </div>
+                  <FaCar className="absolute left-2 top-1/2 transform -translate-y-1/2 text-green-500 text-sm pointer-events-none" />
+                  {statusDropdownOpen && (
+                    <div className="absolute mt-1 w-full bg-white dark:bg-gray-800 rounded-md shadow-lg z-30 border border-gray-200 dark:border-gray-700">
+                      {["All", "Pending", "Completed"].map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => {
+                            setSelectedStatus(option);
+                            setStatusDropdownOpen(false);
+                          }}
+                          className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 truncate"
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                {/* Filter Button */}
-                <button className="px-6 py-3 bg-primary text-white rounded-md text-sm">
-                  Apply Filter
-                </button>
+                {/* Apply Button */}
+                <div className="flex-1 min-w-full sm:min-w-[120px]">
+                  <button className="w-full cursor-pointer bg-secondary text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-md text-sm hover:bg-primary transition">
+                    Apply Filters
+                  </button>
+                </div>
               </div>
             </div>
-            {/* Table starts below this line only */}
+
+            {/* Table */}
             <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead>
-                  <tr className="text-gray-700 dark:text-gray-200 cursor-pointer border-b border-gray-300 dark:border-gray-600">
+                <thead className="bg-gray-50 dark:bg-gray-800">
+                  <tr>
                     {[
                       "Icon",
                       "Header",
                       "Table",
-                      "status",
+                      "Status",
                       "Requested By",
                       "Approved on",
                     ].map((header) => (
                       <th
                         key={header}
-                        className="group px-4 py-3 font-semibold"
+                        className="px-3 py-3 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap"
                       >
                         <div className="flex items-center justify-center cursor-pointer select-none">
                           <span>{header}</span>
@@ -570,17 +606,19 @@ function HotActions() {
                     ))}
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   <tr>
-                    <td colSpan="7" className="py-10 text-center">
-                      <img
-                        src="https://www.app.menutigr.com/static/media/emptyIcon.e5d5b5150b5e6208ac7a2f4dfbdf36a1.svg"
-                        alt="No Records"
-                        className="mx-auto w-28 h-28 mb-4"
-                      />
-                      <p className="text-lg text-gray-500 dark:text-gray-400">
-                        No records available
-                      </p>
+                    <td colSpan="6" className="px-4 py-10 text-center">
+                      <div className="flex flex-col items-center justify-center">
+                        <img
+                          src="https://www.app.menutigr.com/static/media/emptyIcon.e5d5b5150b5e6208ac7a2f4dfbdf36a1.svg"
+                          alt="No Records"
+                          className="w-20 h-20 sm:w-28 sm:h-28 mb-3"
+                        />
+                        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
+                          No records available
+                        </p>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -588,7 +626,6 @@ function HotActions() {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

@@ -174,15 +174,15 @@ function Orders() {
 
           {/* Apply Button */}
           <div className="w-full">
-            <button className="w-full bg-primary text-white px-4 py-3 rounded-md text-sm hover:bg-teal-700 transition">
-              Apply
+            <button className="w-full bg-secondary cursor-pointer text-white px-4 py-3 rounded-md text-sm hover:bg-primary transition">
+              Apply Filters
             </button>
           </div>
 
           {/* Reset Button */}
           <div className="w-full">
-            <button className="w-full border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-md text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-              Reset
+            <button className="w-full border cursor-pointer border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-md text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+              Reset Filters
             </button>
           </div>
         </div>

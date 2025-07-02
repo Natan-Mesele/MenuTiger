@@ -116,21 +116,21 @@ function Website() {
         {/* Tabs with icons */}
         <div className="flex border-b border-gray-300 dark:border-gray-600 mb-6">
           <button
-            className={`flex items-center px-4 py-2 font-medium ${activeTab === "homepage" ? 'border-b-2 border-primary text-primary' : 'text-gray-600 dark:text-gray-300'}`}
+            className={`flex items-center px-4 py-2 font-medium cursor-pointer ${activeTab === "homepage" ? 'border-b-2 border-primary text-primary' : 'text-gray-600 dark:text-gray-300'}`}
             onClick={() => setActiveTab("homepage")}
           >
             <FaHome className="mr-2" />
             Homepage
           </button>
           <button
-            className={`flex items-center px-4 py-2 font-medium ${activeTab === "colors" ? 'border-b-2 border-primary text-primary' : 'text-gray-600 dark:text-gray-300'}`}
+            className={`flex items-center px-4 py-2 font-medium cursor-pointer ${activeTab === "colors" ? 'border-b-2 border-primary text-primary' : 'text-gray-600 dark:text-gray-300'}`}
             onClick={() => setActiveTab("colors")}
           >
             <FaPalette className="mr-2" />
             Colors
           </button>
           <button
-            className={`flex items-center px-4 py-2 font-medium ${activeTab === "themes" ? 'border-b-2 border-primary text-primary' : 'text-gray-600 dark:text-gray-300'}`}
+            className={`flex items-center px-4 py-2 font-medium cursor-pointer ${activeTab === "themes" ? 'border-b-2 border-primary text-primary' : 'text-gray-600 dark:text-gray-300'}`}
             onClick={() => setActiveTab("themes")}
           >
             <FaPaintBrush className="mr-2" />
@@ -141,15 +141,10 @@ function Website() {
         {/* Tab Content */}
         {activeTab === "homepage" && (
           <div className="space-y-6">
-            {/* Divider line */}
-            <div className="border-b border-gray-300 dark:border-gray-600"></div>
-
             {/* Main content area */}
             <div className="flex flex-col md:flex-row gap-8">
               {/* Left side - Section selection */}
               <div className="w-full md:w-1/3 space-y-4">
-                <h3 className="font-medium">Page Sections</h3>
-
                 {['Hero Section', 'About Section', 'Featured Food', 'Why Choose Us', 'Newsletter'].map((section, index) => (
                   <div
                     key={index}
@@ -187,7 +182,7 @@ function Website() {
                         <div className="flex">
                           <button
                             onClick={() => setActiveTabs('configuration')}
-                            className={`px-4 py-2 font-medium ${activeTabs === 'configuration'
+                            className={`px-4 py-2 font-medium cursor-pointer ${activeTabs === 'configuration'
                               ? 'border-b-2 border-primary text-primary'
                               : 'text-gray-500 dark:text-gray-400'
                               }`}
@@ -196,7 +191,7 @@ function Website() {
                           </button>
                           <button
                             onClick={() => setActiveTabs('localize')}
-                            className={`px-4 py-2 font-medium ${activeTabs === 'localize'
+                            className={`px-4 py-2 font-medium cursor-pointer ${activeTabs === 'localize'
                               ? 'border-b-2 border-primary text-primary'
                               : 'text-gray-500 dark:text-gray-400'
                               }`}
@@ -297,7 +292,7 @@ function Website() {
                       <div className="flex">
                         <button
                           onClick={() => setActiveTabs('configuration')}
-                          className={`px-4 py-2 font-medium ${activeTabs === 'configuration'
+                          className={`px-4 py-2 font-medium cursor-pointer ${activeTabs === 'configuration'
                             ? 'border-b-2 border-primary text-primary'
                             : 'text-gray-500 dark:text-gray-400'
                             }`}
@@ -306,7 +301,7 @@ function Website() {
                         </button>
                         <button
                           onClick={() => setActiveTabs('localize')}
-                          className={`px-4 py-2 font-medium ${activeTabs === 'localize'
+                          className={`px-4 py-2 font-medium cursor-pointer ${activeTabs === 'localize'
                             ? 'border-b-2 border-primary text-primary'
                             : 'text-gray-500 dark:text-gray-400'
                             }`}
@@ -389,7 +384,7 @@ function Website() {
                       <div className="flex">
                         <button
                           onClick={() => setActiveTabs('configuration')}
-                          className={`px-4 py-2 font-medium ${activeTabs === 'configuration'
+                          className={`px-4 py-2 font-medium cursor-pointer ${activeTabs === 'configuration'
                             ? 'border-b-2 border-primary text-primary'
                             : 'text-gray-500 dark:text-gray-400'
                             }`}
@@ -398,7 +393,7 @@ function Website() {
                         </button>
                         <button
                           onClick={() => setActiveTabs('localize')}
-                          className={`px-4 py-2 font-medium ${activeTabs === 'localize'
+                          className={`px-4 py-2 font-medium cursor-pointer ${activeTabs === 'localize'
                             ? 'border-b-2 border-primary text-primary'
                             : 'text-gray-500 dark:text-gray-400'
                             }`}
@@ -469,7 +464,7 @@ function Website() {
                       <div className="flex">
                         <button
                           onClick={() => setActiveTabs('configuration')}
-                          className={`px-4 py-2 font-medium ${activeTabs === 'configuration'
+                          className={`px-4 py-2 font-medium cursor-pointer ${activeTabs === 'configuration'
                             ? 'border-b-2 border-primary text-primary'
                             : 'text-gray-500 dark:text-gray-400'
                             }`}
@@ -478,7 +473,7 @@ function Website() {
                         </button>
                         <button
                           onClick={() => setActiveTabs('localize')}
-                          className={`px-4 py-2 font-medium ${activeTabs === 'localize'
+                          className={`px-4 py-2 font-medium cursor-pointer ${activeTabs === 'localize'
                             ? 'border-b-2 border-primary text-primary'
                             : 'text-gray-500 dark:text-gray-400'
                             }`}
@@ -561,7 +556,7 @@ function Website() {
                       <div className="flex">
                         <button
                           onClick={() => setActiveTabs('configuration')}
-                          className={`px-4 py-2 font-medium ${activeTabs === 'configuration'
+                          className={`px-4 py-2 font-medium cursor-pointer ${activeTabs === 'configuration'
                             ? 'border-b-2 border-primary text-primary'
                             : 'text-gray-500 dark:text-gray-400'
                             }`}
@@ -570,7 +565,7 @@ function Website() {
                         </button>
                         <button
                           onClick={() => setActiveTabs('localize')}
-                          className={`px-4 py-2 font-medium ${activeTabs === 'localize'
+                          className={`px-4 py-2 font-medium cursor-pointer ${activeTabs === 'localize'
                             ? 'border-b-2 border-primary text-primary'
                             : 'text-gray-500 dark:text-gray-400'
                             }`}
@@ -638,7 +633,7 @@ function Website() {
               <div className="bg-gray-100 dark:bg-gray-700 px-4 py-3 rounded-md">
                 <span className="font-medium">Colors</span>
               </div>
-              <button className="bg-secondary text-white px-4 py-3 rounded-md flex items-center hover:bg-primary transition-colors">
+              <button className="bg-secondary cursor-pointer text-white px-4 py-3 rounded-md flex items-center hover:bg-primary transition-colors">
                 <FaCheck className="mr-2" />
                 Save
               </button>
@@ -759,7 +754,7 @@ function Website() {
               <div className="bg-gray-100 dark:bg-gray-700 px-4 py-3 rounded-md">
                 <span className="font-medium">Choose a theme</span>
               </div>
-              <button className="bg-secondary text-white px-4 py-3 rounded-md flex items-center hover:bg-primary transition-colors">
+              <button className="bg-secondary cursor-pointer text-white px-4 py-3 rounded-md flex items-center hover:bg-primary transition-colors">
                 <FaCheck className="mr-2" />
                 Save
               </button>
@@ -780,7 +775,7 @@ function Website() {
                 {[1, 2, 3, 4].map(themeNum => (
                   <div
                     key={themeNum}
-                    className={`flex items-center gap-3 p-3 rounded-md border ${selectedTheme === `theme-${themeNum}`
+                    className={`flex items-center gap-3 p-3 rounded-md border cursor-pointer ${selectedTheme === `theme-${themeNum}`
                       ? 'border-primary bg-gray-100 dark:bg-gray-700'
                       : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                     onClick={() => setSelectedTheme(`theme-${themeNum}`)}
@@ -803,28 +798,28 @@ function Website() {
                     <img
                       src="https://www.app.menutigr.com/static/media/theme-1.b7b0418ccc92d58a1163.jpg"
                       alt="Theme 1"
-                      className="h-64 object-contain"
+                      className="h-64 object-contain cursor-pointer"
                     />
                   )}
                   {selectedTheme === 'theme-2' && (
                     <img
                       src="https://www.app.menutigr.com/static/media/default-theme.2f52c112484ee3e1970e.png"
                       alt="Theme 2"
-                      className="h-64 object-contain"
+                      className="h-64 object-contain cursor-pointer"
                     />
                   )}
                   {selectedTheme === 'theme-3' && (
                     <img
                       src="https://www.app.menutigr.com/static/media/theme-3.ea28d9238b6d357bbe24.jpg"
                       alt="Theme 3"
-                      className="h-64 object-contain"
+                      className="h-64 object-contain cursor-pointer"
                     />
                   )}
                   {selectedTheme === 'theme-4' && (
                     <img
                       src="https://www.app.menutigr.com/static/media/theme-4.4811d6fd54457c2c4ad8.jpg"
                       alt="Theme 4"
-                      className="h-64 object-contain"
+                      className="h-64 object-contain cursor-pointer"
                     />
                   )}
                 </div>

@@ -434,7 +434,6 @@ function Surveys() {
                   </div>
 
                   {/* Existing Questions */}
-                  {/* Existing Questions Preview */}
                   {formData.questions.length > 0 && (
                     <div className="space-y-4">
                       {formData.questions.map((question, qIndex) => (
@@ -673,9 +672,8 @@ function Surveys() {
                     </div>
                   )}
 
-
                   {/* Submit Button */}
-                  <button className="w-1/2 mx-auto bg-[#DA7B2C] text-white py-3 rounded-md hover:bg-[#DA7B2C] transition-colors duration-200 block">
+                  <button className="w-1/2 mx-auto cursor-pointer bg-[#DA7B2C] text-white py-3 rounded-md hover:bg-[#DA7B2C] transition-colors duration-200 block">
                     Submit Survey
                   </button>
                 </div>
@@ -741,7 +739,7 @@ function Surveys() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center justify-center">
-                          <span className={`px-3 py-1 rounded-sm text-xs font-medium ${survey.active
+                          <span className={`px-3 py-1 rounded-sm text-xs font-medium cursor-pointer ${survey.active
                             ? 'bg-secondary text-white'
                             : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                             }`}>
@@ -762,14 +760,14 @@ function Surveys() {
                           </label>
                           <button
                             onClick={() => handleEdit(survey.id)}
-                            className="text-gray-500 hover:text-primary"
+                            className="text-gray-500 hover:text-primary cursor-pointer"
                             title="Edit"
                           >
                             <FaEdit />
                           </button>
                           <button
                             onClick={() => handleDelete(survey.id)}
-                            className="text-gray-500 hover:text-red-500"
+                            className="text-gray-500 hover:text-red-500 cursor-pointer"
                             title="Delete"
                           >
                             <FaTrash />

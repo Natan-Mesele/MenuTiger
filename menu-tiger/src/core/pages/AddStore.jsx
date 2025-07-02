@@ -513,7 +513,7 @@ function Stores() {
                     <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700 w-full">
                       <div className="flex items-center space-x-3">
                         <button
-                          className="bg-primary text-white p-2 rounded-md hover:bg-teal-700 transition cursor-pointer flex items-center justify-center w-10 h-10"
+                          className="bg-secondary text-white px-3 py-3 rounded-md hover:bg-primary transition cursor-pointer flex items-center justify-center w-10 h-10"
                           onClick={() => setShowTableForm(false)}
                           aria-label="Back"
                           title="Back"
@@ -526,7 +526,7 @@ function Stores() {
                         </div>
                       </div>
                       <button
-                        className="bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer"
+                        className="bg-secondary text-white px-4 py-3 rounded-sm hover:bg-primary transition cursor-pointer"
                         onClick={handleSave}
                       >
                         Save
@@ -640,7 +640,7 @@ function Stores() {
                     <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
                       <div className="flex gap-4">
                         <button
-                          className="bg-primary text-white px-4 py-3 rounded-sm flex items-center hover:bg-teal-700 transition-colors duration-200"
+                          className="bg-secondary cursor-pointer text-white px-4 py-3 rounded-sm flex items-center hover:bg-primary transition-colors duration-200"
                           onClick={() => {
                             setFormData({ name: "", id: null });
                             setShowTableForm(true);
@@ -728,7 +728,7 @@ function Stores() {
                         </div>
                       </div>
                       <button
-                        className="bg-secondary text-white px-4 py-2 rounded-sm hover:bg-primary transition cursor-pointer"
+                        className="bg-secondary cursor-pointer text-white px-4 py-2 rounded-sm hover:bg-primary transition cursor-pointer"
                         onClick={handleSaveUser}
                       >
                         Save
@@ -877,7 +877,7 @@ function Stores() {
                     {/* Table View */}
                     <div className="flex items-center gap-4 mb-6">
                       <button
-                        className="bg-secondary text-white px-4 py-3 rounded-sm hover:bg-primary transition-colors duration-200"
+                        className="bg-secondary cursor-pointer text-white px-4 py-3 rounded-sm hover:bg-primary transition-colors duration-200"
                         onClick={() => {
                           setUserFormData({
                             firstName: '',
@@ -1085,7 +1085,7 @@ function Stores() {
                       <span>Add your social accounts</span>
                     </div>
                   </div>
-                  <button className="bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer w-full sm:w-auto border border-primary">
+                  <button className="bg-secondary cursor-pointer text-white px-4 py-3 rounded-md hover:bg-teal-700 transition cursor-pointer w-full sm:w-auto border border-primary">
                     Save
                   </button>
                 </div>
@@ -1144,7 +1144,12 @@ function Stores() {
                 </div>
               </div>
             )}
-            {currentPage === 'wifi' && <div>WiFi Content</div>}
+            {currentPage === 'wifi' && (
+              <div>
+
+
+              </div>
+            )}
             {currentPage === 'location' && (
               <div>
                 {/* Header Section - unchanged */}
@@ -1161,7 +1166,7 @@ function Stores() {
                     </div>
                   </div>
                   <button
-                    className="bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition cursor-pointer w-full md:w-auto border border-primary"
+                    className="bg-secondary cursor-pointer text-white px-4 py-3 rounded-md hover:bg-teal-700 transition cursor-pointer w-full md:w-auto border border-primary"
                     onClick={() => {
                       // Add your save logic here
                       console.log('Saving location data:', {
@@ -1275,7 +1280,7 @@ function Stores() {
                     </div>
                   </div>
                   <button
-                    className="bg-secondary text-white px-4 py-3 rounded-sm hover:bg-primary transition cursor-pointer w-full md:w-auto border border-primary"
+                    className="bg-secondary cursor-pointer text-white px-4 py-3 rounded-sm hover:bg-primary transition cursor-pointer w-full md:w-auto border border-primary"
                     onClick={() => {
                       // Prepare settings data to save
                       const settingsData = {

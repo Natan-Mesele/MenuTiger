@@ -172,7 +172,7 @@ function Promotion() {
                 </div>
               </div>
               <button
-                className="bg-secondary text-white px-4 py-3 rounded-sm hover:bg-primary transition cursor-pointer"
+                className="bg-secondary cursor-pointer text-white px-4 py-3 rounded-sm hover:bg-primary transition cursor-pointer"
                 onClick={handleSave}
               >
                 Save
@@ -185,13 +185,13 @@ function Promotion() {
             {/* Tabs */}
             <div className="flex border-b border-gray-300 dark:border-gray-600 mb-6">
               <button
-                className={`px-4 py-2 font-medium ${currentTab === 'promotion' ? 'border-b-2 border-primary text-primary' : 'text-gray-600 dark:text-gray-300'}`}
+                className={`px-4 py-2 font-medium cursor-pointer ${currentTab === 'promotion' ? 'border-b-2 border-primary text-primary' : 'text-gray-600 dark:text-gray-300'}`}
                 onClick={() => setCurrentTab('promotion')}
               >
                 Promotion
               </button>
               <button
-                className={`px-4 py-2 font-medium ${currentTab === 'localize' ? 'border-b-2 border-primary text-primary' : 'text-gray-600 dark:text-gray-300'}`}
+                className={`px-4 py-2 font-medium cursor-pointer ${currentTab === 'localize' ? 'border-b-2 border-primary text-primary' : 'text-gray-600 dark:text-gray-300'}`}
                 onClick={() => setCurrentTab('localize')}
               >
                 Localize
@@ -420,7 +420,7 @@ function Promotion() {
             <div className="mb-6">
               <div className="flex flex-row sm:flex-row gap-4 items-start">
                 <button
-                  className="flex items-center bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition-colors duration-200"
+                  className="flex items-center cursor-pointer bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition-colors duration-200"
                   onClick={handleAddNewClick}
                 >
                   <FaPlus className="mr-2" />

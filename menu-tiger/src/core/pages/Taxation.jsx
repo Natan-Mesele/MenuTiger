@@ -115,7 +115,7 @@ const Taxation = () => {
                             {/* Left: Button and Info */}
                             <div className="flex flex-wrap items-center gap-4">
                                 <button
-                                    className="flex items-center bg-primary text-white px-4 py-2 rounded-md hover:bg-teal-700 transition-colors"
+                                    className="flex items-center bg-secondary text-white px-4 py-2 rounded-md cursor-pointer hover:bg-primary transition-colors"
                                     onClick={() => setShowForm(true)}
                                 >
                                     <FaPlus className="mr-2" />
@@ -126,7 +126,6 @@ const Taxation = () => {
                                     Check local tax rates for accurate menu pricing
                                 </div>
                             </div>
-
                             {/* Right: Search */}
                             <div className="w-full sm:w-1/3">
                                 <input
@@ -138,7 +137,6 @@ const Taxation = () => {
                                 />
                             </div>
                         </div>
-
                         {/* Table */}
                         <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">

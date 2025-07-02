@@ -360,7 +360,7 @@ const Menu = () => {
             </p>
             <button
               onClick={downloadTemplate}
-              className="mt-4 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-md flex items-center justify-center gap-2 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
+              className="mt-4 bg-gray-200 dark:bg-gray-600 cursor-pointer text-gray-800 dark:text-gray-100 px-4 py-2 rounded-md flex items-center justify-center gap-2 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
             >
               <FaCloudDownloadAlt className="text-secondary text-lg" />
               Download Template
@@ -512,7 +512,7 @@ const Menu = () => {
         <button
           onClick={handleSaveMenu}
           disabled={!menuName}
-          className={`px-4 py-3 text-sm rounded-md text-white ${!menuName ? 'bg-secondary cursor-not-allowed' : 'bg-secondary hover:bg-primary'
+          className={`px-4 py-3 text-sm rounded-md cursor-pointer text-white ${!menuName ? 'bg-secondary cursor-not-allowed' : 'bg-secondary hover:bg-primary'
             }`}
         >
           Save
@@ -595,7 +595,7 @@ const Menu = () => {
           {tabs.map((tab) => (
             <button
               key={tab.name}
-              className={`pb-2 px-4 font-semibold flex items-center ${activeTab === tab.name
+              className={`pb-2 px-4 font-semibold flex items-center  cursor-pointer ${activeTab === tab.name
                 ? "border-b-2 border-primary text-primary"
                 : "text-gray-700 dark:text-gray-300"
                 }`}
@@ -621,7 +621,7 @@ const Menu = () => {
                     {/* Updated Add New button with reduced width */}
                     <button
                       onClick={handleAddNewClick}
-                      className="flex items-center bg-primary text-white px-3 py-2 rounded-md text-sm hover:bg-teal-700 transition-colors duration-200"
+                      className="flex items-center bg-secondary text-white px-4 py-3 rounded-md text-sm hover:bg-primary cursor-pointer transition-colors duration-200"
                     >
                       <FaPlus className="mr-2" />
                       Add New
@@ -703,7 +703,7 @@ const Menu = () => {
                   ) : (
                     <div className="bg-[#F8FAFC] border border-gray-200 rounded-md p-4 sm:p-6 h-52 flex items-center justify-center w-64">
                       <button
-                        className="bg-primary text-white p-6 cursor-pointer rounded-md flex items-center justify-center hover:bg-teal-700 transition-colors duration-200"
+                        className="bg-secondary text-white p-6 cursor-pointer rounded-md flex items-center justify-center hover:bg-primary transition-colors duration-200"
                         onClick={handleAddNewClick}
                       >
                         <FaPlus className="text-lg" />
@@ -743,7 +743,7 @@ const Menu = () => {
                           Download the sample sheet and fill it with your items.
                         </p>
                         <button
-                          className="flex items-center justify-between w-full bg-secondary text-white px-4 py-3 rounded-sm text-sm hover:bg-teal-700 transition-colors duration-200"
+                          className="flex items-center justify-between cursor-pointer w-full bg-secondary text-white px-4 py-3 rounded-sm text-sm hover:bg-teal-700 transition-colors duration-200"
                           onClick={() => {
                             setIsChoosingSetupMethod(false);
                             setCurrentStep(1);
@@ -763,7 +763,7 @@ const Menu = () => {
                           Start with an empty menu and build your items manually.
                         </p>
                         <button
-                          className="flex items-center justify-between w-full bg-secondary text-white px-4 py-3 rounded-sm text-sm hover:bg-teal-700 transition-colors duration-200"
+                          className="flex items-center justify-between cursor-pointer w-full bg-secondary text-white px-4 py-3 rounded-sm text-sm hover:bg-teal-700 transition-colors duration-200"
                           onClick={() => {
                             setIsChoosingSetupMethod(false);
                             setIsStartingFromScratch(true);
@@ -832,7 +832,7 @@ const Menu = () => {
               {!showModifierForm && (
                 <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <button
-                    className="flex items-center bg-secondary text-white px-4 py-3 rounded-md hover:bg-primary transition-colors duration-200"
+                   className="flex items-center bg-secondary text-white px-4 py-3 rounded-md text-sm hover:bg-primary cursor-pointer transition-colors duration-200"
                     onClick={() => setShowModifierForm(true)}
                   >
                     <FaPlus className="mr-2" />
@@ -869,7 +869,7 @@ const Menu = () => {
                     </div>
                     <button
                       onClick={handleSaveModifier}
-                      className="px-4 py-3 text-sm rounded-md text-white bg-secondary hover:bg-primary"
+                      className="px-4 py-3 text-sm rounded-md cursor-pointer text-white bg-secondary hover:bg-primary"
                     >
                       Save
                     </button>
@@ -965,7 +965,7 @@ const Menu = () => {
                             {modifierOptions.length > 1 && (
                               <button
                                 onClick={() => deleteModifierOption(index)}
-                                className="text-red-500 hover:text-red-700"
+                                className="text-red-500 hover:text-red-700 cursor-pointer"
                               >
                                 <FaTrash />
                               </button>
@@ -976,7 +976,7 @@ const Menu = () => {
 
                       {/* Add Modifier Option Button */}
                       <button
-                        className="mt-3 px-3 py-3 border border-primary text-primary rounded-sm text-sm hover:bg-primary hover:text-white transition"
+                        className="mt-3 px-3 py-3 border cursor-pointer border-primary text-primary rounded-sm text-sm hover:bg-primary hover:text-white transition"
                         onClick={addModifierOption}
                       >
                         + Add Modifier Option
@@ -1123,14 +1123,14 @@ const Menu = () => {
                         <td className="px-4 py-2">{item.date}</td>
                         <td className="px-4 py-2 text-center space-x-4">
                           <button
-                            className="text-blue-600 hover:text-blue-800"
+                            className="text-blue-600 hover:text-blue-800 cursor-pointer"
                             title="Restore"
                             onClick={() => handleRestore(item.id)}
                           >
                             <FaHistory />
                           </button>
                           <button
-                            className="text-red-600 hover:text-red-800"
+                            className="text-red-600 hover:text-red-800 cursor-pointer"
                             title="Delete"
                             onClick={() => handleArchiveDelete(item.id)}
                           >
